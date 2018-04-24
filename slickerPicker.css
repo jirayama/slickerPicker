@@ -96,7 +96,11 @@ td div {
   padding: 5px;
   position: relative;
 }
-.flexCol {
+.componentWrapper {
+  position: relative;
+  overflow: hidden;
+}
+/*.flexCol {
   display: flex;
   flex-direction: column;
 }
@@ -105,7 +109,7 @@ td div {
   display: flex;
   flex-direction: row;
 }
-
+*/
 
 .mainPicker {
   display: inline-block;
@@ -113,15 +117,15 @@ td div {
 }
 .colorPicker{
 position: relative;
-width: 100%;
+
 }
 .huePicker{
 position: relative;
-width: 100%;
+
 }
 .alphaPicker {
 position: relative;
-width: 100%;
+
 }
 
 .paletteHolder {
@@ -139,8 +143,6 @@ width: 100%;
 
 .knob {
   position: absolute;
-    top: 0;
-    left: 0;
     display: inline-block;
     width: 20px;
     height: 20px;
@@ -149,4 +151,48 @@ width: 100%;
     z-index: 20;
     border-radius: 200px;
     pointer-events: none;
+    top: -10px;
+    left: -10px;
 }
+
+.knobLock{
+  top:0;
+   left: -10px;
+}
+
+.colorPicker:hover, .huePicker:hover, .alphaPicker:hover{
+  cursor: pointer;
+}
+
+.preview{
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.69);
+    border-radius: 200px;
+    pointer-events: none;
+    float: right;
+}
+.previewWrap{
+  padding:5px 5px 5px 0 ;
+}
+
+.blackSelect{
+  background: black;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+ /* border-radius: 3px;*/
+  border:1px solid grey;
+}
+
+.whiteSelect {
+  background: white;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  /*border-radius: 3px;*/
+  border:1px solid lightgrey;
+}
+
