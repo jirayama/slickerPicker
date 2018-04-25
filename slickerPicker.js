@@ -97,8 +97,8 @@ function slickerPicker(opt) {
     lowerWrapper.appendMany(black, white, preview);
     component.appendMany(colorPicker_wrapper, huePicker_wrapper, alphaPicker_wrapper,lowerWrapper);
 
-    function udpatePreview(rgba){
-      currentRGB = rgba;
+    function udpatePreview(rgb){
+      currentRGB = rgb;
       previewInner.addBackground(rgba2String([currentRGB[0],currentRGB[1],currentRGB[2],currentAlpha]));
       draw_alphaPicker([currentRGB[0],currentRGB[1],currentRGB[2],currentAlpha]);
     }
@@ -163,7 +163,7 @@ function slickerPicker(opt) {
     }
 
     module.addEventListener('mousemove', function(e){
-      // use only this for Element for all events within this parent
+      // use only this for Element for all events
       console.log(e.offsetX,e.offsetY,e.x,e.y);
     })
 
@@ -289,6 +289,7 @@ function slickerPicker(opt) {
       e.stopPropagation();
     })
     componentHolder.appendChild(component);
+    udpatePreview(currentRGB);
   }
   // end -- main picker
 
