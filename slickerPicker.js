@@ -163,7 +163,7 @@ function slickerPicker(opt) {
     }
 
     module.addEventListener('mousemove', function(e){
-      // use only this for Element for all events
+      // use only this for Element for all events within this parent
       console.log(e.offsetX,e.offsetY,e.x,e.y);
     })
 
