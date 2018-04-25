@@ -1,3 +1,6 @@
+
+
+
 function slickerPicker(opt) {
   opt = opt || {};
   var width = opt.width || 200,
@@ -7,6 +10,7 @@ function slickerPicker(opt) {
       },
       hue = 160,
       currentAlpha = 1,
+      activeKnob = {},
       currentRGB = hsl2rbg(hue,100,50),
       currentPos = {x:0,y:0},
       cp_click = 0,
@@ -29,16 +33,35 @@ function slickerPicker(opt) {
       ];
 
   var target = document.getElementById(opt.target);
+  var mouseDown = 0;
+
+  document.addEventListener('mousedown',function() { mouseDown = 1;  });
+  document.addEventListener('mouseup',function() { mouseDown = 0; activeKnob = {}; });
 
   function moveKnob(el,x,y, lock){
+    if(!el)return;
     lock = lock || false;
     if(lock){
       el.style.transform = "translate(" + x + "px, 0px)";
     } else {
       el.style.transform = "translate(" + x + "px, " + y + "px)";
     }
-
   }
+
+  function calcOffset(){
+    if(!activeKnob.className) return {x: 0 , y: 0};
+    var ch = componentHolder.getBoundingClientRect();
+    var a = activeKnob.getBoundingClientRect();
+    var x,y;
+    if ( (a.left - ch.left) < 0 ) {
+      x = 0;
+    } 
+    // else if ( (a.left - ch.left) > (ch.right - ch.x) ) {
+    //   x = 0;
+    // }
+    return {x: a.left - ch.left , y: a.top - ch.top};
+  }
+
   // COMPONENTS
 
   // start -- plugin module
@@ -162,10 +185,58 @@ function slickerPicker(opt) {
       }
     }
 
-    module.addEventListener('mousemove', function(e){
+    module.addEventListener('mousedown', function(e){
       // use only this for Element for all events
-      console.log(e.offsetX,e.offsetY,e.x,e.y);
-    })
+      // console.log(e.offsetX,e.offsetY,e.x,e.y);
+      if(e.target.className.indexOf('colorPicker') !== -1){
+        activeKnob = cp_knob;
+        moveKnob(activeKnob,e.x - (e.x - e.offsetX), e.y - (e.y - e.offsetY));
+      } else if(e.target.className.indexOf('huePicker') !== -1){
+         activeKnob = hp_knob;
+         moveKnob(activeKnob,e.x - (e.x - e.offsetX), e.y - (e.y - e.offsetY),true);
+      } else if(e.target.className.indexOf('alphaPicker') !== -1){
+         activeKnob = ap_knob;
+         moveKnob(activeKnob,e.x - (e.x - e.offsetX), e.y - (e.y - e.offsetY),true);
+      }
+
+      console.log(activeKnob.getBoundingClientRect(),componentHolder.getBoundingClientRect())
+      // moveKnob(activeKnob,e.offsetX,e.offsetY);
+    });
+
+    // module.addEventListener('mouseup', function(e){
+    //   activeKnob = {};
+    //   console.log(activeKnob, mousedown);
+    // });
+    // module.addEventListener('mouseenter', function(e){
+    //   activeKnob = {};
+    //   console.log(activeKnob, mousedown);
+    // });
+
+
+    module.addEventListener('mouseup', function(e){
+      activeKnob = null;
+    });
+
+    module.addEventListener('mousemove', function(e){
+      if(!activeKnob) return;
+      var x,y;
+      x = e.x - (e.x - e.offsetX);
+      y = e.y - (e.y - e.offsetY);
+      console.log(calcOffset().x, calcOffset().y)
+
+
+      if(mouseDown === 1){
+        console.log(activeKnob.className)
+         if(activeKnob.className === "knob knobLock"){
+          moveKnob(activeKnob,x,y,true);
+          console.log('lock')
+        } else {
+          console.log('no lock')
+          moveKnob(activeKnob,x,y);
+        }
+      }
+    });
+    // component.addEventListener('mousemove', function(e){ e.preventDefault();})
 
     black.addEventListener('click', function(){
       currentPos.x = width;
@@ -182,31 +253,33 @@ function slickerPicker(opt) {
     });
 
     colorPicker_wrapper.addEventListener('mousedown',function(e){
-      cp_click = 1;
-      var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);
-      udpatePreview(color.rgba);
-      currentPos.x = e.offsetX;
-      currentPos.y = e.offsetY;
-      moveKnob(cp_knob,e.offsetX,e.offsetY);
+      // cp_click = 1;
+      // var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);
       cp_knob.style.display = "inline-block";
-    })
-    colorPicker_wrapper.addEventListener('mouseup',function(e){
-      cp_click = 0;
-    })
+    });
+      // udpatePreview(color.rgba);
+      // currentPos.x = e.offsetX;
+      // currentPos.y = e.offsetY;
+      // moveKnob(cp_knob,e.offsetX,e.offsetY);
+    //   cp_knob.style.display = "inline-block";
+    // })
+    // colorPicker_wrapper.addEventListener('mouseup',function(e){
+    //   cp_click = 0;
+    // })
 
-    colorPicker_wrapper.addEventListener('mouseleave',function(e){
-      cp_click = 0;
-    })
-    colorPicker_wrapper.addEventListener('mousemove',function(e){
-      console.log(cp_click);
-      if(cp_click === 1) {
-        var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);
-        udpatePreview(color.rgba);        
-        currentPos.x = e.offsetX;
-        currentPos.y = e.offsetY;
-        moveKnob(cp_knob,e.offsetX,e.offsetY);
-      } 
-    })
+    // colorPicker_wrapper.addEventListener('mouseleave',function(e){
+    //   cp_click = 0;
+    // })
+    // colorPicker_wrapper.addEventListener('mousemove',function(e){
+    //   console.log(cp_click);
+    //   if(cp_click === 1) {
+    //     var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);
+    //     udpatePreview(color.rgba);
+    //     currentPos.x = e.offsetX;
+    //     currentPos.y = e.offsetY;
+    //     moveKnob(cp_knob,e.x,e.y);
+    //   }
+    // })
 
     huePicker_wrapper.addEventListener('mousedown',function(e){
       hp_click = 1;
@@ -328,7 +401,7 @@ function slickerPicker(opt) {
   // even listeners
 
   target.addEventListener('click', function(e) {
-    e.stopPropagation();
+    // e.stopPropagation();
     e.preventDefault();
     open();
   })
