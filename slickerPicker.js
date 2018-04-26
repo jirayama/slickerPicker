@@ -68,7 +68,7 @@ function slickerPicker(opt) {
     } else {
       y = posY;
     }
-    
+
     return {x: x - padding , y: y - padding};
   }
 
@@ -97,11 +97,13 @@ function slickerPicker(opt) {
         alphaPicker_wrapper = new El('div').addClass('componentWrapper'),
         alphaPicker = new El('canvas').addClass('alphaPicker flexCol'),
         alphaPicker_ctx = alphaPicker.getContext('2d'),
-        lowerWrapper = new El('div').addClass('componentWrapper previewWrap'),
+        lowerWrapper = new El('div').addClass('componentWrapper'),
         black = new El('div').addClass('blackSelect'),
         white = new El('div').addClass('whiteSelect'),
         preview = new El('div').addClass('preview'),
-        previewInner = new El('div').addClass('previewInner');
+        previewWrap = new El('div').addClass('previewWrap'),
+        previewInner = new El('div').addClass('previewInner'),
+        pluginName = new El('div').addClass('pluginName').addText('slicker picker');
 
 
 
@@ -125,17 +127,19 @@ function slickerPicker(opt) {
 
 
     preview.appendChild(previewInner);
+    previewWrap.appendChild(preview)
 
     colorPicker_wrapper.appendMany(cp_knob,colorPicker);
     huePicker_wrapper.appendMany(hp_knob,huePicker);
     alphaPicker_wrapper.appendMany(ap_knob,alphaPicker);
-    lowerWrapper.appendMany(black, white, preview);
+    lowerWrapper.appendMany(black, white, previewWrap, pluginName);
     component.appendMany(colorPicker_wrapper, huePicker_wrapper, alphaPicker_wrapper,lowerWrapper);
 
     function updatePreview(rgb){
       currentRGB = rgb;
       previewInner.addBackground(rgba2String([currentRGB[0],currentRGB[1],currentRGB[2],currentAlpha]));
       draw_alphaPicker([currentRGB[0],currentRGB[1],currentRGB[2],currentAlpha]);
+      console.log(currentRGB, currentAlpha)
     }
 
     draw_colorPicker = function(h) {
@@ -198,22 +202,22 @@ function slickerPicker(opt) {
     }
 
     module.addEventListener('mousedown', function(e){
-      // use only this for Element for all events     
+      // use only this for Element for all events
       e.target.draggable = false;
       activeKnob_w = e.target.width;
       activeKnob_h = e.target.height;
-      var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);      
+      var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);
       // updatePreview(color.rgba);
 
-      if(e.target.className.indexOf('colorPicker') !== -1){
+      if(e.target.className.includes('colorPicker')){
         activeKnob = cp_knob;
         var pos = calcOffset(e.x,e.y,activeKnob_w, activeKnob_h);
         moveKnob(activeKnob,pos.x ,pos.y );
-      } else if(e.target.className.indexOf('huePicker') !== -1){
+      } else if(e.target.className.includes('huePicker')){
         activeKnob = hp_knob;
         var pos = calcOffset(e.x,e.y,activeKnob_w, activeKnob_h);
         moveKnob(activeKnob,pos.x ,pos.y ,true);
-      } else if(e.target.className.indexOf('alphaPicker') !== -1){
+      } else if(e.target.className.includes('alphaPicker')){
         activeKnob = ap_knob;
         var pos = calcOffset(e.x,e.y,activeKnob_w, activeKnob_h);
         moveKnob(activeKnob,pos.x ,pos.y ,true);
@@ -226,16 +230,15 @@ function slickerPicker(opt) {
     });
 
     module.addEventListener('mousemove', function(e){
-      if(!activeKnob) return;
-      console.log(currentPos);
-      
+      if(!activeKnob.className) return;
+
       if(mouseDown === 1){
         var pos = calcOffset(e.x,e.y,activeKnob_w, activeKnob_h);
         if(activeKnob.className.includes('cp_knob')){
           currentPos = {x: pos.x , y: pos.y};
         }
-        
-         if(activeKnob.className === "knob knobLock"){
+
+         if(activeKnob.className.includes('knobLock')){
           moveKnob(activeKnob, pos.x ,pos.y ,true);
         } else {
           moveKnob(activeKnob,pos.x ,pos.y);
@@ -259,14 +262,14 @@ function slickerPicker(opt) {
 
     colorPicker_wrapper.addEventListener('mousedown',function(e){
       var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);
-      cp_knob.style.display = "inline-block";      
+      cp_knob.style.display = "inline-block";
       currentPos.x = e.offsetX;
       currentPos.y = e.offsetY;
       updatePreview(color.rgba);
     })
     colorPicker_wrapper.addEventListener('mousemove',function(e){
-        if(mouseDown === 1 && activeKnob.className.includes('cp_knob')){        
-        var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);        
+        if(mouseDown === 1 && activeKnob.className.includes('cp_knob')){
+        var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);
         currentPos.x = e.offsetX;
         currentPos.y = e.offsetY;
         updatePreview(color.rgba);
@@ -289,7 +292,7 @@ function slickerPicker(opt) {
 
     huePicker_wrapper.addEventListener('mousemove',function(e){
       if(mouseDown === 1 && activeKnob.className.includes('hp_knob')){
-        console.log("test")     
+        console.log("test")
         var color = getPixelColor(huePicker,e.offsetX,e.offsetY);
         hue = color.hsl[0];
         moveKnob(hp_knob,e.offsetX,e.offsetY, true);
@@ -301,15 +304,15 @@ function slickerPicker(opt) {
 
     alphaPicker_wrapper.addEventListener('mousedown',function(e){
       var alpha = e.offsetX/width;
-      if (alpha > .96){
+      if (alpha > 1){
         alpha = 1;
-      } else if (alpha < .05){
+      } else if (alpha < 0){
         alpha = 0;
       }
       currentAlpha = alpha;
        updatePreview(currentRGB);
     })
-   
+
     alphaPicker_wrapper.addEventListener('mousemove',function(e){
       if(mouseDown === 1 && activeKnob.className.includes('ap_knob')){
         var alpha = e.offsetX/width;
@@ -396,120 +399,6 @@ function slickerPicker(opt) {
   new SP_mainPicker();
   // new SP_palette();
 }
-
-  // updateValues(0, 0);
-  // readout.style.width = "100%";
-  // readout.appendChild(DOM_tableHeader('R', 'G', 'B'));
-  // readout.appendChild(DOM_tableRow(r_value, g_value, b_value));
-  // readout.appendChild(DOM_tableHeader('H', 'S', 'L'));
-  // readout.appendChild(DOM_tableRow(h_value, s_value, l_value));
-  // wrapTop.appendMany(canvas, hueBar);
-  // wrapBottom.appendMany(readout, cursorOuter);
-  // wrap.appendMany(wrapTop, wrapBottom);
-  // wrapTop.className = "pickerInnerTop";
-  // wrapBottom.className = "pickerInnerBottom";
-  // document.addEventListener('click', function(e) {
-  //   close();
-  // })
-  // target.addEventListener('click', function(e) {
-  //   e.stopPropagation();
-  //   e.preventDefault();
-  //   open();
-  // })
-  // wrap.addEventListener('click', function(e) {
-  //   e.preventDefault();
-  // })
-  // function updateValues(rgb, hsl) {
-  //   r_value.innerHTML = (rgb[0] ? rgb[0] : 0);
-  //   g_value.innerHTML = (rgb[1] ? rgb[1] : 0);
-  //   b_value.innerHTML = (rgb[2] ? rgb[2] : 0);
-  //   h_value.innerHTML = (hsl[0] ? hsl[0] : 0);
-  //   s_value.innerHTML = (hsl[1] ? hsl[1] : 0);
-  //   l_value.innerHTML = (hsl[2] ? hsl[2] : 0);
-  //   cursorInner.style.background = "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")";
-  // }
-  // wrap.className = "colorPicker";
-  // cursorInner.className = 'cursorInner';
-  // cursorOuter.className = 'cursorOuter';
-  // cursorOuter.appendChild(cursorInner);
-  // canvas.setAttribute('width', 200);
-  // canvas.setAttribute('height', 200);
-  // canvas.style.display ='block';
-  // ctx.scale(2, 2);
-  // hueBar.setAttribute('width', 200);
-  // hueBar.setAttribute('height', 30);
-  // hueBar.style.marginTop = "10px";
-  // HBctx.scale(2, 2);
-
-  // canvas.addEventListener('click', function(e) {
-  //   e.preventDefault();
-  // })
-  // canvas.addEventListener('contextmenu', function(e) {
-  //   e.preventDefault();
-  // })
-  // canvas.addEventListener('mousedown', function(e) {
-  //   mouseDownPicker = 1;
-  //   var context = this.getContext('2d');
-  //   var X = (e.offsetX < 0 ? 0 : e.offsetX);
-  //   var Y = (e.offsetY < 0 ? 0 : e.offsetY);
-  //   var data = context.getImageData(X, Y, 1, 1).data;
-  //   var hsl = rgba2hsl(data);
-  //   cursorOuter.style.borderColor = "#FF5722";
-  //   updateValues(data, hsl);
-  // })
-  // canvas.addEventListener('mousemove', function(e) {
-  //   if(mouseDownPicker === 1){
-  //     var X = (e.offsetX < 0 ? 0 : e.offsetX);
-  //     var Y = (e.offsetY < 0 ? 0 : e.offsetY);
-  //     var context = this.getContext('2d');
-  //     var data = context.getImageData(X, Y, 1, 1).data;
-  //     var hsl = rgba2hsl(data);
-  //     updateValues(data, hsl);
-  //   }
-  // })
-  // canvas.addEventListener('mouseup', function(e) {
-  //   mouseDownPicker = 0;
-  //   cursorOuter.style.borderColor = "#a9a3a3";
-  //   // close();
-  // })
-
-  // wrapTop.addEventListener("mouseenter", function() {
-  //   cursorOuter.style.display = "inline-block";
-  //   wrapTop.style.cursor = 'none';
-  // })
-  // wrapTop.addEventListener("mouseleave", function() {
-  //   wrapTop.style.cursor = 'default';
-  // })
-  // wrapTop.addEventListener('mousemove', function(e) {
-  //   cursorOuter.style.transform = "translate(" + (e.clientX) + "px," + (e.clientY) + "px)";
-  //   console.log('wrap', e.offsetX, e.offsetY)
-  // })
-
-  // hueBar.addEventListener('mousedown', function(e) {
-  //   mouseDownHue = 1;
-  //   var context = this.getContext('2d');
-  //   var data = context.getImageData(e.offsetX, e.offsetY, 1, 1).data;
-  //   var hsl = rgba2hsl(data);
-  //   if (hsl) {
-  //     draw(hsl[0]);
-  //     updateValues(data, hsl);
-  //   };
-  // })
-  // hueBar.addEventListener('mousemove', function(e) {
-  //   e.preventDefault();
-  //   if (mouseDownHue === 1) {
-  //     var context = this.getContext('2d');
-  //     var data = context.getImageData(e.offsetX, e.offsetY, 1, 1).data;
-  //     var hsl = rgba2hsl(data);
-  //     if (hsl) {
-  //       draw(hsl[0]);
-  //       updateValues(data, hsl);
-  //     };
-  //   }
-  // })
-  // hueBar.addEventListener('mouseup', function(e) {
-  //   mouseDownHue = 0;
-  // })
 
 function getPixelColor(canvas, posX,posY){
   var context = canvas.getContext('2d'),
