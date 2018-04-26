@@ -206,7 +206,6 @@ float: left;
   width: 20px;
   height: 20px;
   display: inline-block;
- /* border-radius: 3px;*/
   border:1px solid grey;
 }
 
@@ -215,8 +214,11 @@ float: left;
   width: 20px;
   height: 20px;
   display: inline-block;
-  /*border-radius: 3px;*/
   border:1px solid lightgrey;
+}
+
+.whiteSelect:hover, .blackSelect:hover{
+  cursor: pointer;
 }
 
 .pluginName{
