@@ -1,3 +1,6 @@
+
+
+
 function slickerPicker(opt) {
   opt = opt || {};
   var width = opt.width || 200,
@@ -7,8 +10,11 @@ function slickerPicker(opt) {
       },
       hue = 160,
       currentAlpha = 1,
+      activeKnob = {},
+      activeKnob_w = 0,
+      activeKnob_h = 0,
       currentRGB = hsl2rbg(hue,100,50),
-      currentPos = {x:0,y:0},
+      currentPos = {x:154,y:34},
       cp_click = 0,
       hp_click = 0,
       ap_click = 0,
@@ -29,23 +35,51 @@ function slickerPicker(opt) {
       ];
 
   var target = document.getElementById(opt.target);
+  var mouseDown = 0;
+
+  document.addEventListener('mousedown',function() { mouseDown = 1;  });
+  document.addEventListener('mouseup',function() { mouseDown = 0; activeKnob = {}; });
 
   function moveKnob(el,x,y, lock){
+    if(!el)return;
     lock = lock || false;
     if(lock){
       el.style.transform = "translate(" + x + "px, 0px)";
     } else {
       el.style.transform = "translate(" + x + "px, " + y + "px)";
     }
-
   }
+
+  function calcOffset(posX, posY, w, h){
+    var padding = 20,
+        x = 0,
+        y = 0;
+    if ( posX - padding < 0 ) {
+      x =  padding;
+    } else if(posX - padding > w){
+      x = w + padding ;
+    } else {
+      x = posX;
+    }
+    if ( posY - padding< 0 ) {
+      y = padding;
+    } else if(posY - padding> h){
+      y = h + padding;
+    } else {
+      y = posY;
+    }
+    
+    return {x: x - padding , y: y - padding};
+  }
+
   // COMPONENTS
 
   // start -- plugin module
   var module = new El('div').addClass('module'),
       componentHolder = new El('div').addClass('componentHolder');
   module.appendChild(componentHolder);
-  // componentHolder.style.maxWidth = width + "px";
+  module.ondragstart = function() { return false; };
+
   // end -- plugin module
 
   // start -- main picker
@@ -54,9 +88,9 @@ function slickerPicker(opt) {
         colorPicker_wrapper = new El('div').addClass('componentWrapper'),
         colorPicker = new El('canvas').addClass('colorPicker flexCol'),
         colorPicker_ctx = colorPicker.getContext('2d'),
-        cp_knob = new El('div').addClass('knob'),
-        hp_knob = new El('div').addClass('knob knobLock'),
-        ap_knob = new El('div').addClass('knob knobLock'),
+        cp_knob = new El('div').addClass('knob cp_knob'),
+        hp_knob = new El('div').addClass('knob knobLock hp_knob'),
+        ap_knob = new El('div').addClass('knob knobLock ap_knob'),
         huePicker_wrapper = new El('div').addClass('componentWrapper'),
         huePicker = new El('canvas').addClass('huePicker flexCol'),
         huePicker_ctx = huePicker.getContext('2d'),
@@ -68,6 +102,7 @@ function slickerPicker(opt) {
         white = new El('div').addClass('whiteSelect'),
         preview = new El('div').addClass('preview'),
         previewInner = new El('div').addClass('previewInner');
+
 
 
     colorPicker.setAttribute('width', width);
@@ -82,7 +117,7 @@ function slickerPicker(opt) {
     alphaPicker.setAttribute('height', width/10);
     alphaPicker_ctx.scale(width/100,width/100);
 
-    cp_knob.style.display = 'none';
+    // cp_knob.style.display = 'none';
 
     moveKnob(hp_knob, hue/360*width , 0);
     moveKnob(ap_knob, width , 0);
@@ -97,7 +132,7 @@ function slickerPicker(opt) {
     lowerWrapper.appendMany(black, white, preview);
     component.appendMany(colorPicker_wrapper, huePicker_wrapper, alphaPicker_wrapper,lowerWrapper);
 
-    function udpatePreview(rgb){
+    function updatePreview(rgb){
       currentRGB = rgb;
       previewInner.addBackground(rgba2String([currentRGB[0],currentRGB[1],currentRGB[2],currentAlpha]));
       draw_alphaPicker([currentRGB[0],currentRGB[1],currentRGB[2],currentAlpha]);
@@ -106,13 +141,13 @@ function slickerPicker(opt) {
     draw_colorPicker = function(h) {
       h = h || hue;
       var s = 0,
-        l = 100,
-        endL = 50,
-        startL = l,
-        startS = s,
-        endS = 100,
-        x = 0,
-        y = 0;
+          l = 100,
+          endL = 50,
+          startL = l,
+          startS = s,
+          endS = 100,
+          x = 0,
+          y = 0;
 
       colorPicker_ctx.clearRect(0, 0, width, width);
 
@@ -162,82 +197,109 @@ function slickerPicker(opt) {
       }
     }
 
+    module.addEventListener('mousedown', function(e){
+      // use only this for Element for all events     
+      e.target.draggable = false;
+      activeKnob_w = e.target.width;
+      activeKnob_h = e.target.height;
+      var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);      
+      // updatePreview(color.rgba);
+
+      if(e.target.className.indexOf('colorPicker') !== -1){
+        activeKnob = cp_knob;
+        var pos = calcOffset(e.x,e.y,activeKnob_w, activeKnob_h);
+        moveKnob(activeKnob,pos.x ,pos.y );
+      } else if(e.target.className.indexOf('huePicker') !== -1){
+        activeKnob = hp_knob;
+        var pos = calcOffset(e.x,e.y,activeKnob_w, activeKnob_h);
+        moveKnob(activeKnob,pos.x ,pos.y ,true);
+      } else if(e.target.className.indexOf('alphaPicker') !== -1){
+        activeKnob = ap_knob;
+        var pos = calcOffset(e.x,e.y,activeKnob_w, activeKnob_h);
+        moveKnob(activeKnob,pos.x ,pos.y ,true);
+      }
+    });
+
+    module.addEventListener('mouseup', function(e){
+      activeKnob = null;
+      e.target.draggable = false;
+    });
+
     module.addEventListener('mousemove', function(e){
-      // use only this for Element for all events
-      console.log(e.offsetX,e.offsetY,e.x,e.y);
-    })
+      if(!activeKnob) return;
+      console.log(currentPos);
+      
+      if(mouseDown === 1){
+        var pos = calcOffset(e.x,e.y,activeKnob_w, activeKnob_h);
+        if(activeKnob.className.includes('cp_knob')){
+          currentPos = {x: pos.x , y: pos.y};
+        }
+        
+         if(activeKnob.className === "knob knobLock"){
+          moveKnob(activeKnob, pos.x ,pos.y ,true);
+        } else {
+          moveKnob(activeKnob,pos.x ,pos.y);
+        }
+      }
+    });
 
     black.addEventListener('click', function(){
       currentPos.x = width;
       currentPos.y = width;
-      udpatePreview([0,0,0,1]);
+      updatePreview([0,0,0,1]);
       moveKnob(cp_knob,currentPos.x,currentPos.y);
     });
 
     white.addEventListener('click', function(){
       currentPos.x = 0;
       currentPos.y = 0;
-      udpatePreview([255,255,255,1]);
+      updatePreview([255,255,255,1]);
       moveKnob(cp_knob,currentPos.x,currentPos.y);
     });
 
     colorPicker_wrapper.addEventListener('mousedown',function(e){
-      cp_click = 1;
       var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);
-      udpatePreview(color.rgba);
+      cp_knob.style.display = "inline-block";      
       currentPos.x = e.offsetX;
       currentPos.y = e.offsetY;
-      moveKnob(cp_knob,e.offsetX,e.offsetY);
-      cp_knob.style.display = "inline-block";
-    })
-    colorPicker_wrapper.addEventListener('mouseup',function(e){
-      cp_click = 0;
-    })
-
-    colorPicker_wrapper.addEventListener('mouseleave',function(e){
-      cp_click = 0;
+      updatePreview(color.rgba);
     })
     colorPicker_wrapper.addEventListener('mousemove',function(e){
-      console.log(cp_click);
-      if(cp_click === 1) {
-        var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);
-        udpatePreview(color.rgba);        
+        if(mouseDown === 1 && activeKnob.className.includes('cp_knob')){        
+        var color = getPixelColor(colorPicker,e.offsetX,e.offsetY);        
         currentPos.x = e.offsetX;
         currentPos.y = e.offsetY;
-        moveKnob(cp_knob,e.offsetX,e.offsetY);
-      } 
+        updatePreview(color.rgba);
+      }
+    })
+    colorPicker.addEventListener('mouseup', function(e){
+      currentPos.x = e.offsetX;
+      currentPos.y = e.offsetY;
     })
 
-    huePicker_wrapper.addEventListener('mousedown',function(e){
-      hp_click = 1;
-      var colorPreview = getPixelColor(colorPicker,currentPos.x,currentPos.y);
-      udpatePreview(colorPreview.rgba);
 
+    huePicker_wrapper.addEventListener('mousedown',function(e){
       var color = getPixelColor(huePicker,e.offsetX,e.offsetY);
       hue = color.hsl[0];
       draw_colorPicker();
+      var colorPreview = getPixelColor(colorPicker,currentPos.x,currentPos.y);
+      updatePreview(colorPreview.rgba);
       moveKnob(hp_knob,e.offsetX,e.offsetY, true);
     })
-    huePicker_wrapper.addEventListener('mouseup',function(e){
-      hp_click = 0;
-    })
-    huePicker_wrapper.addEventListener('mouseleave',function(e){
-      hp_click = 0;
-    })
-    huePicker_wrapper.addEventListener('mousemove',function(e){
-      if(hp_click === 1){
-        var colorPreview = getPixelColor(colorPicker,currentPos.x,currentPos.y);
-        udpatePreview(colorPreview.rgba);
 
+    huePicker_wrapper.addEventListener('mousemove',function(e){
+      if(mouseDown === 1 && activeKnob.className.includes('hp_knob')){
+        console.log("test")     
         var color = getPixelColor(huePicker,e.offsetX,e.offsetY);
         hue = color.hsl[0];
-         moveKnob(hp_knob,e.offsetX,e.offsetY, true);
+        moveKnob(hp_knob,e.offsetX,e.offsetY, true);
         draw_colorPicker();
+        var colorPreview = getPixelColor(colorPicker,currentPos.x,currentPos.y);
+         updatePreview(colorPreview.rgba);
       }
     })
 
     alphaPicker_wrapper.addEventListener('mousedown',function(e){
-      ap_click = 1;
       var alpha = e.offsetX/width;
       if (alpha > .96){
         alpha = 1;
@@ -245,33 +307,26 @@ function slickerPicker(opt) {
         alpha = 0;
       }
       currentAlpha = alpha;
-      udpatePreview([currentRGB[0],currentRGB[1],currentRGB[2],currentAlpha]);
-      moveKnob(ap_knob,e.offsetX,e.offsetY, true);
+       updatePreview(currentRGB);
     })
-    alphaPicker_wrapper.addEventListener('mouseup',function(e){
-      ap_click = 0;
-    })
-    alphaPicker_wrapper.addEventListener('mouseleave',function(e){
-      if(ap_click === 1)ap_click = 0;
-    })
+   
     alphaPicker_wrapper.addEventListener('mousemove',function(e){
-      if(ap_click === 1){
+      if(mouseDown === 1 && activeKnob.className.includes('ap_knob')){
         var alpha = e.offsetX/width;
       if (alpha > .96){
         alpha = 1;
       } else if (alpha < .05){
         alpha = 0;
       }
-      currentAlpha = alpha;
-      udpatePreview([currentRGB[0],currentRGB[1],currentRGB[2],currentAlpha]);
-        moveKnob(ap_knob,e.offsetX,e.offsetY, true);
+        currentAlpha = alpha;
+       updatePreview(currentRGB);
       }
     })
 
-    cp_knob.addEventListener('mousemove',function(e){
-      e.preventDefault();
-      e.stopPropagation();
-    })
+    // cp_knob.addEventListener('mousemove',function(e){
+    //   e.preventDefault();
+    //   e.stopPropagation();
+    // })
 
     draw_colorPicker();
     draw_huePicker();
@@ -289,7 +344,9 @@ function slickerPicker(opt) {
       e.stopPropagation();
     })
     componentHolder.appendChild(component);
-    udpatePreview(currentRGB);
+    moveKnob(cp_knob,currentPos.x,currentPos.y)
+
+    updatePreview(getPixelColor(colorPicker,currentPos.x,currentPos.y).rgba);
   }
   // end -- main picker
 
@@ -328,7 +385,7 @@ function slickerPicker(opt) {
   // even listeners
 
   target.addEventListener('click', function(e) {
-    e.stopPropagation();
+    // e.stopPropagation();
     e.preventDefault();
     open();
   })
