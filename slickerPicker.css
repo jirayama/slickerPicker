@@ -93,7 +93,7 @@ td div {
 }
 .component {
   border: 1px solid lightgrey;
-  padding: 5px;
+/*  padding: 5px;*/
   position: relative;
 }
 .componentWrapper {
