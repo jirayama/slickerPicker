@@ -84,13 +84,16 @@ td div {
   background: transparent;
   display: inline-block;
   position: absolute;
-  top:0;
-  left:0;
+  top:-20px;
+  left:-20px;
+  z-index: 999;
 }
 
 .componentHolder{  
   box-shadow: 4px 6px 12px -1px rgba(0, 0, 0, 0.13);
   width: 200px;
+  background: #f4f2ef;
+  text-align: left;
 }
 .component {
   border: 1px solid lightgrey;
@@ -98,19 +101,11 @@ td div {
   position: relative;
 }
 .componentWrapper {
-  position: relative;
-  overflow: hidden;
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
 }
-/*.flexCol {
-  display: flex;
-  flex-direction: column;
-}
-
-.flexRow {
-  display: flex;
-  flex-direction: row;
-}
-*/
 
 .mainPicker {
   display: inline-block;
@@ -133,7 +128,7 @@ float: left;
  background-image: linear-gradient(45deg, lightgrey 25%, transparent 25%), linear-gradient(-45deg, lightgrey 25%, transparent 25%), linear-gradient(45deg, transparent 75%, lightgrey 75%), linear-gradient(-45deg, transparent 75%, lightgrey 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-
+border-bottom: 1px solid #E0E0E0;
 }
 
 .paletteHolder {
@@ -179,13 +174,17 @@ float: left;
     border: 2px solid white;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.69);
     border-radius: 200px;
-    pointer-events: none;
+/*    pointer-events: none;*/
     float: right;
     position: relative;
     overflow: hidden;
          background-image: linear-gradient(45deg, lightgrey 25%, transparent 25%), linear-gradient(-45deg, lightgrey 25%, transparent 25%), linear-gradient(45deg, transparent 75%, lightgrey 75%), linear-gradient(-45deg, transparent 75%, lightgrey 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.preview:hover{
+  cursor: pointer;
 }
 .previewInner{
     display: inline-block;
@@ -222,12 +221,57 @@ float: left;
 }
 
 .pluginName{
-  position: absolute;
-    bottom: 0;
-    left: 0;
-    padding: 3px;
+    /* float: right; */
+    padding: 5px;
+    padding-bottom: 0;
     font-size: 12px;
     font-style: italic;
     color: #9E9E9E;
 }
 
+.label {
+  font-size: 12px;
+    color: grey;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.readout_wrapper {
+  padding: 5px;
+}
+
+.readout_display{
+    padding: 5px;
+    margin-top: 3px;
+/*    border-bottom: 1px solid lightgrey;
+    border-left: 1px solid lightgrey;*/
+    border: 1px solid lightgrey;
+    width: 100%;
+    color: #616161;
+     font-size: 13px;
+}
+
+.bottomLine {
+  border-bottom: 1px solid lightgrey;
+}
+.topLine {
+  border-top: 1px solid lightgrey;
+}
+
+.slickerPicker{
+    content: " ";
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    background-color: #03A9F4;
+    margin: 0;
+    vertical-align: middle;
+    border-radius: 100%;
+    border: 2px solid white;
+    box-shadow: 0 0 3px rgb(0, 0, 0);
+    position: relative;
+}
+
+.slickerPicker:hover{
+  /*cursor: pointer;
+}*/
