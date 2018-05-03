@@ -4,27 +4,201 @@
   <meta charset="UTF-8">
   <title>tile</title>
   <link href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" rel="stylesheet">
-    <script type="text/javascript" src="DOMhelper.js"></script>
-
-  <script type="text/javascript" src="slickerPicker.js"></script>
-  <link rel="stylesheet" href="slickerPicker.css">
-  <link rel="stylesheet" href="tileEditor.css">
   <style type="text/css">
+         *{
+         box-sizing: border-box;
+         margin:0;
+         padding: 0;
+         font-family: 'Inter UI', sans-serif;
+         -webkit-user-select: none;
+         -moz-user-select: none;
+         -ms-user-select: none;
+         user-select: none;
+         }
+         body {
+          position: relative;
+         }
+         .toolIcon {
+         display: inline-block;
+         margin-right: 9px;
+         font-size: 1.5em;
+         color: #616161;
+         will-change: transform;
+         transition: 100ms;
+         }
+
+
+         .toolIcon:hover {
+         transform: scale(1.2,1.2);
+         cursor: pointer;
+         }
+         .controls {
+         display: inline-flex;
+         flex-direction: row;
+         align-items: center;
+         margin-left: 20px;
+         margin-top: 20px;
+         padding: 7px;
+         border: 1px solid #616161;
+         }
+         #tileEdit, #image {
+         margin: 20px;
+         border: 12px solid #616161;
+         display: inline-block;
+         vertical-align: top;
+         margin-right: 10px;
+         /*position: relative;*/
+         image-rendering: pixelated;
+         }
+
+         canvas{
+           display: none;
+         }
+
+         #tileEdit:hover{
+           cursor: none;
+         }
+         #palette{
+         margin: 20px;
+         }
+         .picker{
+           border: 1px solid #616161;
+           box-shadow: 1px 1px 1px black;
+         }
+
+         #picker{
+           transform: translate(-0,-3px)scale(.9,.9);
+           z-index: 2
+         }
+
+         #pickerBack{
+           transform: translate(-24px,4px)scale(.9,.9);
+           margin-right: -19px;
+         }
+         input[type="color"] {
+         -webkit-appearance: none;
+         border: none;
+         width: 35px;
+         height: 35px;
+         border-radius: 5px;
+         overflow: hidden;
+         outline: none;
+         }
+         input[type="color"]::-webkit-color-swatch-wrapper {
+         padding: 0;
+         }
+         input[type="color"]::-webkit-color-swatch {
+         border: none;
+         }
+         .tile {
+         width: 20px;
+         height:  20px;
+         display: inline-block;
+         border-right: 1px solid #dcd9d9;
+       border-bottom: 1px solid #dcd9d9;
+         float:left;
+         position: relative;
+         }
+         .noRight{
+           border-right: none;
+         }
+         .noBottom {
+           border-bottom: none;
+         }
+         .colorPreview {
+         width: 20px;
+         height:  20px;
+         display: inline-block;
+         border-radius: 5px;
+         border: 1px solid black;
+         float:left;
+         position: absolute;
+         top: 0;
+         left: 0;
+         z-index: 5;
+         /*opacity: .5;*/
+         transform-origin: center;
+         transform: translate(-2px,-2px);
+         box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+         }
+         .tile:hover {
+         }
+         .color {
+         width: 40px;
+         height: 40px;
+         display: inline-block;
+         border: 1px solid #616161;
+         margin-right: 3px;
+         margin-bottom: 3px;
+         float: left;
+         }
+         .color:hover {
+         cursor: pointer;
+         }
+         br {
+         clear:left;
+         }
+         .selected {
+         color: #2196F3;
+         }
+         .grid {
+         display: inline-flex;
+         align-items: center;
+         }
+         .grid input {
+         width: 50px;
+         padding: 3px;
+         }
+         .grid span{
+         text-transform: uppercase;
+         margin:5px;
+         }
+         .grid label {
+         margin-left: 24px;
+         margin-right: 5px;
+         font-size: 18px;
+         }
+         .mouse {
+         position: absolute;
+         top:0;
+         left:0;
+         z-index: 20;
+         font-size: 30px;
+         display: none;
+         pointer-events: none ;
+         }
+
+         .mouse i{
+           text-shadow: 2px 0px 0px white,-2px 0px 0px white,0px 2px 0px white,0px -2px 0px white, 2px 2px 4px grey;
+         }
+         .mouse .fa-tint {
+           transform: translate(-10px,30px);
+         }
+         .mouse .fa-eraser {
+           transform: translate(-15px,5px);
+         }
+         .imgSizer {
+           display: inline-block;
+         }
+
+    /*      #help{
+           vertical-align: middle;
+           font-size: 20px;
+         }
+    */
+
 
 
   </style>
 </head>
-<body id='body'>
-<div class="main" id="main">
+<body>
+  <!-- <canvas id="canvas"></canvas> -->
   <div class="controls" id="controls">
-    <div id="foreGround" ></div>
-    <div id="backGround" ></div>
-    <input style="display:none" class="toolIcon picker" id="picker" type="color" value="#98B0C0">
-    <input style="display:none" class="toolIcon picker" id="pickerBack" type="color" value="#708098">
-    <!-- <div class="toolIcon">
+    <input class="toolIcon picker" id="picker" type="color" value="#98B0C0"> <input class="toolIcon picker" id="pickerBack" type="color" value="#708098">
+    <div class="toolIcon">
       <i class="fas fa-plus" id="Add2Palette" title="A"></i>
-    </div> -->
-    <div class="toolIcon" id="pencil_wrap" title="B" style="margin-left: 10px;">
+    </div>
+    <div class="toolIcon" id="pencil_wrap" title="B">
       <i class=" fas fa-paint-brush" id="pencil"></i>
     </div>
     <div class="toolIcon" id="fill_wrap" title="F">
@@ -41,30 +215,25 @@
     </div>
     <div class="toolIcon" id="picture_wrap">
       <i class="far fa-image fa-lg" id="picture"></i>
-    </div><input id="zoom" max="40" min="2" type="range" value="4">
-    <a class="toolIcon otherTool themeBlue" id='saveA' style='margin-left: 30px'><i class="far fa-save" id="save"></i></a>
-    <div class="toolIcon otherTool themeRed" id="delete_wrap" title="X">
+    </div><input id="zoom" max="40" min="2" type="range" value="4"> <a class="toolIcon" id='saveA' style='margin-left: 30px'><i class="far fa-save" id="save"></i></a>
+    <div class="toolIcon" id="delete_wrap" title="X">
       <i class=" far fa-trash-alt" id="delete"></i>
     </div>
-    <div class="toolIcon otherTool themeYellow">
+    <div class="toolIcon">
       <i class="far fa-question-circle" id='help'></i>
     </div>
     <form class="grid" id="grid" name="grid">
       <label>Grid size</label> <input name="col" type="number" value="16"> <span>x</span> <input name="row" type="number" value="16">
     </form>
-<!--     <label>Theme</label>
-    <div class="theme" id="themeLight"><i class="fas fa-lightbulb"></i></div>
-    <div class="theme themeSelected" id="themeDark"><i class="far fa-lightbulb"></i></div> -->
   </div>
   <div id="palette">
     <div id="colors"></div>
   </div><br>
   <div id="tileEdit"></div>
   <canvas id="canvas"></canvas>
-  <div class="imageWrap">
+  <div class="imgSizer">
     <img id="image" src="" style="margin-left: 10px;"><br>
   </div>
-</div>
   <script type="text/javascript">
        // user can set canvas size
        // tools: 1px, eraser, fill, custom brush?
@@ -76,18 +245,18 @@
       return this.slice(0);
     };
 
-    function TileEditor() {
+    function Game() {
       var bw = 16,
         bh = 16,
         draw = 0,
-        body = document.getElementById('body'),
         history = new Array(10),
         mouse = document.createElement('i'),
         mouseWrap = document.createElement('div'),
-        palette = ["#98B0C0", "#708098", "#F8A868", "#F05868", "#800000", "#808000", "#008080", "#00FFFF", "#800080", "#ffffff"],
+        palette = ["#98B0C0", "#708098", "#F8A868", "#F05868", "#800000", "#808000", "#008080", "#00FFFF", "#800080"],
         picker = document.getElementById("picker"),
         pickerBack = document.getElementById('pickerBack'),
         image = document.getElementById('image'),
+        Add2Palette = document.getElementById('Add2Palette'),
         colors = document.getElementById("colors"),
         grid = document.getElementById('grid'),
         saveA = document.getElementById('saveA'),
@@ -112,6 +281,8 @@
         return selectedColor;
       };
       picker.addEventListener('change', function(e) {
+        // s.log(e.target.value)
+        // palette.push(e.target.value);
         currentColor(e.target.value);
       });
 
@@ -124,7 +295,7 @@
         palette.push(selectedColor.toUpperCase());
         updateColors();
       }
-      // Add2Palette.addEventListener('click', newColor);
+      Add2Palette.addEventListener('click', newColor);
 
       function hex2rgb(hex, opacity) {
         var h = hex.replace('#', '');
@@ -134,7 +305,7 @@
         return 'rgb(' + h.join(',') + ')';
       }
 
-      function rgba2hex(rgb) {
+      function rgb2hex(rgb) {
         if (rgb === 'transparent') {
           rgb = "rgb(255,255,255)";
         }
@@ -152,7 +323,7 @@
           e.preventDefault();
         });
         colors.addEventListener('mousedown', function(e) {
-          currentColor(rgba2hex(e.target.style.background));
+          currentColor(rgb2hex(e.target.style.background));
           if (e.which === 3) {
             setBackground(selectedColor);
           } else {
@@ -163,7 +334,7 @@
           }
         });
         colors.addEventListener('click', function(e) {
-          currentColor(rgba2hex(e.target.style.background));
+          currentColor(rgb2hex(e.target.style.background));
           if (e.which === 3) {
             setBackground(selectedColor);
           } else {
@@ -182,18 +353,16 @@
       }
 
       function setForeground(color) {
-        if(color.toUpperCase() == 'transparent'.toUpperCase()) return;
         picker.value = color;
       }
 
       function setBackground(color) {
-        if(color.toUpperCase() == 'transparent'.toUpperCase()) return;
         pickerBack.value = color;
       }
 
       function currentColor(color) {
         selectedColor = color.toUpperCase();
-        if (color.toUpperCase() === "transparent".toUpperCase()) {
+        if (color === "transparent") {
           selectedColor = 'transparent'.toUpperCase();
           mouseWrap.style.color = "black";
         } else {
@@ -256,10 +425,14 @@
             }
           }
           div.addEventListener('mouseenter', function(e) {
+            // div.style.borderColor = 'black';
+            // div.style.borderWidth = "2px";
             div.style.transform = "translate(-2px, -2px)";
             div.style.boxShadow = "2px 2px 2px black";
           });
           div.addEventListener('mouseleave', function(e) {
+            // div.style.borderColor = '#dcd9d9';
+            // div.style.borderWidth = "1px";
             div.style.transform = "translate(0px, 0px)";
             div.style.boxShadow = 'none';
           });
@@ -269,30 +442,18 @@
         });
         brd.addEventListener('mousedown', function(e) {
           if (e.which === 3) {
-            if(selected_tool === 'eraser'){
-              currentColor('transparent');
-            } else {
-              currentColor(pickerBack.value.toUpperCase());
-            }
-          } else {
-            if(selected_tool === 'eraser'){
-              currentColor('transparent');
-            } else {
-              currentColor(picker.value.toUpperCase());
-            }
+            //use background color
+            currentColor(pickerBack.value.toUpperCase());
+            console.log("right click");
           }
           draw = 1;
-          if (e.target.className.indexOf('tile') !== -1 && e.target.style.background !== selectedColor && (selected_tool === 'pencil' || selected_tool === 'eraser')) {
+          // console.log('selected_tool',selected_tool)
+          if (e.target.className === 'tile' && e.target.style.background !== selectedColor && (selected_tool === 'pencil' || selected_tool === 'eraser')) {
             e.target.style.background = selectedColor;
             board[e.target.getAttribute('data-index')] = selectedColor;
             drawCanvas();
           } else if (selected_tool === 'dropper') {
-            if(e.target.style.background.toUpperCase() === 'transparent'.toUpperCase()){
-              currentColor('transparent')
-            } else {
-              currentColor(rgba2hex(e.target.style.background));
-            }
-
+            currentColor(rgb2hex(e.target.style.background));
             if (e.which === 3) {
               setBackground(selectedColor);
             } else {
@@ -307,7 +468,7 @@
           mouseWrap.style.top = e.y - 30 + "px";
           mouseWrap.style.left = e.x + "px";
           if (draw === 1 && selected_tool !== 'dropper') {
-            if (e.target.className.indexOf('tile') !== -1 && e.target.style.background !== selectedColor) {
+            if (e.target.className === 'tile' && e.target.style.background !== selectedColor) {
               e.target.style.background = selectedColor;
               board[e.target.getAttribute('data-index')] = selectedColor;
               drawCanvas();
@@ -316,7 +477,7 @@
         });
         brd.addEventListener('mouseup', function(e) {
           draw = 0;
-          // currentColor(picker.value.toUpperCase());
+          currentColor(picker.value.toUpperCase());
         });
         brd.addEventListener('mouseenter', function(e) {
           mouseWrap.style.display = "inline-block";
@@ -336,16 +497,13 @@
         selected_tool = tool2select;
         var tools = document.getElementsByClassName('toolIcon');
         for (var i = 0; i < tools.length; i++) {
-          if(tools[i].className.indexOf('other') === -1){
-            if ((tool2select + "_wrap") === tools[i].id) {
-              tools[i].className = 'toolIcon selected';
-              tools[i].style.transform = "scale(1.2,1.2)";
-            } else if (tools[i].id !== 'picker' && tools[i].id !== 'pickerBack') {
-              tools[i].className = 'toolIcon';
-              tools[i].style.transform = "scale(1,1)";
-            }
+          if ((tool2select + "_wrap") === tools[i].id) {
+            tools[i].className = 'toolIcon selected';
+            tools[i].style.transform = "scale(1.2,1.2)";
+          } else if (tools[i].id !== 'picker' && tools[i].id !== 'pickerBack') {
+            tools[i].className = 'toolIcon';
+            tools[i].style.transform = "scale(1,1)";
           }
-
         }
       }
 
@@ -354,7 +512,7 @@
         if (name === 'eraser') {
           currentColor("transparent");
           mouse.className = "fas fa-eraser";
-          mouseWrap.style.color = "black";
+          mouseWrap.style.color = "grey";
           updateColors();
         } else if (name === 'delete') {
           if (window.confirm("Do you really want delete?")) {
@@ -362,6 +520,7 @@
             mouse.className = "fas fa-paint-brush";
             init();
           }
+          // boardUpdate()
         } else if (name === 'pencil') {
           currentColor(picker.value);
           mouse.className = "fas fa-paint-brush";
@@ -518,24 +677,7 @@
         }
       });
     }
-
-
-
-
-      var g = new TileEditor();
-      var fore = new slickerPicker({
-        target: 'foreGround',
-        outputTarget: 'picker'
-      });
-
-      var back = new slickerPicker({
-        target: 'backGround',
-        outputTarget: 'picker'
-      });
-
-
+    var g = new Game()
   </script>
-
-
 </body>
 </html>

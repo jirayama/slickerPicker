@@ -40,7 +40,7 @@ Object.prototype.addText = function(x){
 }
 
 Object.prototype.addBackground = function(x){
-	this.style.backgroundColor = x;
+	this.style.background = x;
 	return this;
 }
 

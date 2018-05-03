@@ -1,0 +1,305 @@
+* {
+     box-sizing: border-box;
+     margin: 0;
+     padding: 0;
+     font-family: 'Inter UI', sans-serif;
+     -webkit-user-select: none;
+     -moz-user-select: none;
+     -ms-user-select: none;
+     user-select: none;
+   }
+
+   body {
+     position: relative;
+     background: #a8a8a8;
+     color: #abb2bf;
+     text-align: center;
+   }
+   .main {
+    display: inline-block;
+    margin: auto;
+    padding-bottom: 20px;
+    border: 1px solid #838383;
+    margin-top: 20px;
+    background: #f5f5f5;
+    box-shadow: 2px 3px 8px -2px rgba(0, 0, 0, 0.27);
+}
+   .toolIcon {
+     display: inline-block;
+     margin:0 5px ;
+     font-size: 1.5em;
+     color: #616161;
+     will-change: transform;
+     transition: 100ms;
+   }
+   .toolIcon:hover {
+     transform: scale(1.2, 1.2);
+     cursor: pointer;
+   }
+   .otherTool{
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
+    align-items: center;
+    justify-content: center;
+   }
+   .controls {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+       width: 100%;
+    padding: 8px;
+    background: #f5f5f5;
+/*    border-bottom: 5px solid #838383;*/
+   }
+   #tileEdit, #image {
+     margin: 20px;
+     border: 1px solid #838383;
+     display: inline-block;
+     vertical-align: top;
+     margin-right: 10px;
+     /*position: relative;*/
+     image-rendering: pixelated;
+     /* background: #ffffff;*/
+         background-image: linear-gradient(45deg, lightgrey 25%, transparent 25%), linear-gradient(-45deg, lightgrey 25%, transparent 25%), linear-gradient(45deg, transparent 75%, lightgrey 75%), linear-gradient(-45deg, transparent 75%, lightgrey 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+   }
+   #canvas {
+     display: none;
+   }
+   #tileEdit:hover {
+     cursor: none;
+   }
+   #palette {
+     margin: 20px;
+         display: block;
+    text-align: left;
+   }
+   .picker {
+     border: 1px solid #616161;
+     box-shadow: 1px 1px 1px black;
+   }
+
+   #foreGround {
+    background: lightgrey;
+    border-radius: 8px 0 0 8px;
+   }
+   #backGround {
+     background: grey;
+     margin-right: 10px;
+     border-radius: 0 8px 8px 0;
+   }
+   .pickerBlock{
+    width:30px;
+    height: 30px;
+    display: inline-block;
+    border-radius: 5px;
+   }
+
+   .pickerBlock:hover {
+    cursor: pointer;
+   }
+   input[type="color"] {
+     -webkit-appearance: none;
+     border: none;
+     width: 35px;
+     height: 35px;
+
+     overflow: hidden;
+     outline: none;
+   }
+   input[type="color"]::-webkit-color-swatch-wrapper {
+     padding: 0;
+   }
+   input[type="color"]::-webkit-color-swatch {
+     border: none;
+   }
+   .tile {
+     width: 20px;
+     height: 20px;
+     display: inline-block;
+     border-right: 1px solid #2196f3;
+     border-bottom: 1px solid #2196f3;
+     float: left;
+     position: relative;
+   }
+   .noRight {
+     border-right: none;
+   }
+   .noBottom {
+     border-bottom: none;
+   }
+   .colorPreview {
+     width: 20px;
+     height: 20px;
+     display: inline-block;
+     border-radius: 5px;
+     border: 1px solid black;
+     float: left;
+     position: absolute;
+     top: 0;
+     left: 0;
+     z-index: 5;
+     /*opacity: .5;*/
+     transform-origin: center;
+     transform: translate(-2px, -2px);
+     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+   }
+   .tile:hover {}
+   .color {
+     width: 40px;
+     height: 40px;
+     display: inline-block;
+     border: 1px solid #616161;
+     margin-right: 3px;
+     margin-bottom: 3px;
+     float: left;
+   }
+   .color:hover {
+     cursor: pointer;
+   }
+   br {
+     clear: left;
+   }
+   .selected {
+     color: #2196F3;
+   }
+   .grid {
+     display: inline-flex;
+     align-items: center;
+   }
+   .grid input {
+    width: 50px;
+    padding: 3px;
+    background: white;
+    border: 1px solid #9d968e;
+   }
+   .grid span {
+     text-transform: uppercase;
+     margin: 5px;
+   }
+   label {
+     margin-left: 24px;
+     margin-right: 5px;
+     font-size: 18px;
+         color: #585353;
+   }
+   .mouse {
+     position: absolute;
+     top: 0;
+     left: 0;
+     z-index: 20;
+     font-size: 30px;
+     display: none;
+     pointer-events: none;
+   }
+   .mouse i {
+     text-shadow: 2px 0px 0px white, -2px 0px 0px white, 0px 2px 0px white, 0px -2px 0px white, 2px 2px 4px grey;
+   }
+   .mouse .fa-tint {
+     transform: translate(-10px, 30px);
+   }
+   .mouse .fa-eraser {
+     transform: translate(-15px, 5px);
+   }
+   .imageWrap {
+     display: inline-block;
+     vertical-align: top;
+   }
+   .theme{
+        font-size: 25px;
+    padding: 5px;
+    color: #a9a3a3;
+    border: 2px solid;
+    margin-left: 7px;
+   }
+   .themeSelected{
+    background: #2784ce;
+    color: #f4f2ef;
+   }
+
+   .themeBlue {
+    background: #2784ce;
+   }
+
+   .themeRed{
+    background: #FF5722;
+   }
+
+   .themeYellow {
+    background: #FFC107;
+   }
+
+   .cursorInner{
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 100%;
+    box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.5), inset -1px -1px 3px rgba(0, 0, 0, 0.41);
+    pointer-events: none;
+}
+
+.cursorOuter {
+    /*display: inline-block;*/
+    width: 40px;
+    height: 40px;
+    background: whitesmoke;
+    padding: 3px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.43);
+    border: 1px solid #a9a3a3;
+    border-radius: 100px 100px 100px 0;
+    position: absolute;
+    z-index: 5;
+    top: 0;
+    left:0;
+    pointer-events: none;
+    display: none;
+}
+
+/*.colorPicker {
+    background: white;
+    display: inline-block;
+    padding: 15px;
+    border-radius: 3px;
+    border: 1px solid hsl(48, 3%, 65%);
+    box-shadow: rgba(0, 0, 0, 0.32) 1px 2px 6px;
+    position: absolute;
+    z-index: 999;
+    top: 0;
+    left: 0;
+}*/
+
+.modal {
+display: flex;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 30px;
+    z-index: 888;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th {
+  padding-top: 5px;
+}
+
+td {
+  text-align: center;
+  border:1px solid;
+  width: 33.3333%;
+  border: 1px solid lightgrey;
+    padding: 3px;
+}
+
+td div {
+  width:100%;
+}
