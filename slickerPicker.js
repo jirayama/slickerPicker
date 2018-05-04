@@ -128,22 +128,34 @@ function slickerPicker(opt) {
       var readout_component = new El('div').addClass('component'),
           readout_component_wrapper = new El('div').addClass('componentWrapper topLine'),
           readout_wrapper = new El('div').addClass('readout_wrapper'),
-          toggle = new El('div').addClass('readout_toggle'),
-          rgba_display = new El('div').addClass('readout_display'),
-          rgba_label = new El('div').addClass('label').addText('RGBA'),
-          hex_display = new El('div').addClass('readout_display'),
-          hex_label = new El('div').addClass('label').addText('HEX'),
-          hsl_display = new El('div').addClass('readout_display'),
-          hsl_label = new El('div').addClass('label').addText('HSL');
+          readout_table = new El('table').addClass('readout_table'),
+          readout_R = new El('input').addType('number'),
+          readout_G = new El('input').addType('number'),
+          readout_B = new El('input').addType('number'),
+          readout_A = new El('input').addType('number'),
+          readout_H = new El('input').addType('number'),
+          readout_S = new El('input').addType('number'),
+          readout_L = new El('input').addType('number'),
+          readout_hex = new El('input').addType('number');
+
+      // readout_table.appendChild(DOM_tableHeader("R","G","B","A"));
+      readout_table.appendChild(DOM_tableRow(
+        new Els(new El('div').addText("R"), readout_R),
+        new Els(new El('div').addText("G"),readout_G),
+        new Els(new El('div').addText("B"),readout_B),
+        new Els(new El('div').addText("A"),readout_A)));
+      readout_table.appendChild(DOM_tableHeader("H","S","L"));
+      readout_table.appendChild(DOM_tableRow(readout_H,readout_S,readout_L));
 
       readout_component_wrapper.addEventListener('click', function(e) {   e.stopPropagation();  e.preventDefault();  })
-      readout_wrapper.appendMany(rgba_label,rgba_display,hex_label,hex_display,hsl_label,hsl_display);
+      // readout_wrapper.appendMany(rgba_label,rgba_display,hex_label,hex_display,hsl_label,hsl_display);
+      readout_wrapper.appendChild(readout_table);
       readout_component_wrapper.appendChild(readout_wrapper);
       // readout_component.appendChild(readout_component_wrapper);
 
-      rgba_display.innerHTML = rgba2String(currentRGB);
-      hex_display.innerHTML = rgbToHex(currentRGB);
-      hsl_display.innerHTML = rgba2hslString(currentRGB);
+      // rgba_display.innerHTML = rgba2String(currentRGB);
+      // hex_display.innerHTML = rgbToHex(currentRGB);
+      // hsl_display.innerHTML = rgba2hslString(currentRGB);
     }
 
     pluginName_wrapper.appendChild(pluginName);
@@ -189,9 +201,9 @@ function slickerPicker(opt) {
       draw_alphaPicker([currentRGB[0],currentRGB[1],currentRGB[2],currentAlpha]);
      
       if(opt && opt.readout){
-        rgba_display.innerHTML = rgba2String(currentRGB);
-        hex_display.innerHTML = rgbToHex(currentRGB);
-        hsl_display.innerHTML = rgba2hslString(currentRGB);
+        // rgba_display.innerHTML = rgba2String(currentRGB);
+        // hex_display.innerHTML = rgbToHex(currentRGB);
+        // hsl_display.innerHTML = rgba2hslString(currentRGB);
       }
       SP_btn.style.backgroundColor = rgba2String(currentRGB);
       if(opt && opt.outputTarget){
