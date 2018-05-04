@@ -3,6 +3,14 @@ function El(type){
 	return document.createElement(type);
 }
 
+function Els(items){
+	var wrap = new El('div');
+	Object.keys(arguments).forEach((key)=>{
+		wrap.appendChild(arguments[key]);
+	})
+	return wrap;
+}
+
 Object.prototype.addClass = function(x){
 	this.className = x;
 	return this;
