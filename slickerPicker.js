@@ -214,7 +214,8 @@ function slickerPicker(opt) {
           startS = s,
           endS = 100,
           x = 0,
-          y = 0;
+          y = 0,
+          color;
 
       colorPicker_ctx.clearRect(0, 0, width, width);
 
@@ -235,8 +236,9 @@ function slickerPicker(opt) {
 
     }
 
-    draw_huePicker = function() {
-      var h = 1;
+    function draw_huePicker() {
+      var h = 1,
+          color;
       for (var x = 0; x <= 100; x++) {
         color = hsl2rbg(h, 100, 50);
         huePicker_ctx.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -245,7 +247,7 @@ function slickerPicker(opt) {
       }
     }
 
-    draw_alphaPicker = function(rbg) {
+    function draw_alphaPicker(rbg) {
       var h = 1,
           y = 0,
           heightIncrement = (width/10)/4;
