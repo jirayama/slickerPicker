@@ -59,24 +59,35 @@
 
 
 
-table {
-  border-collapse: collapse;
+.readout_table {
+border-collapse: separate;
+    border-spacing: 5px ;
+  table-layout:fixed;
+width: 100%;
+}
+.readout_table tr {
+  margin-top: 5px;
+}
+.readout_table th {
+text-align: center;
+    border: 1px solid lightgrey;
+    border-bottom: none;
+    font-size: 11px;
+    color: grey;
 }
 
-th {
-  padding-top: 5px;
-}
-
-td {
+.readout_table td {
   text-align: center;
   border:1px solid;
-  width: 33.3333%;
+/*  width: 33.3333%;*/
   border: 1px solid lightgrey;
-    padding: 3px;
 }
 
-td div {
+.readout_table td input {
   width:100%;
+  padding 3px;
+  border:none;
+  text-align: center;
 }
 
 .module {
