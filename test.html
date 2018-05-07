@@ -4,9 +4,11 @@
 	<meta charset="UTF-8">
 	<title>Document</title>
 
-  <script type="text/javascript" src="slickerPicker.js"></script>
-  <link rel="stylesheet" href="slickerPicker.css">
+<!--   <script type="text/javascript" src="slickerPicker.js"></script> -->
+  <link rel="stylesheet" href="sp.css">
       <script type="text/javascript" src="DOMhelper.js"></script>
+           <script type="text/javascript" src="sp.js"></script>
+           <script type="text/javascript" src="colorConverters.js"></script>
 </head>
 <body>
 	<div id="test1"></div>
@@ -14,12 +16,15 @@
 </body>
 <script>
 
-      var x = new slickerPicker({
-        target: 'test1'
-      });
+      // var x = new slickerPicker({
+      //   target: 'test1',
+      //   readout: true
+      // });
 
-      var y = new slickerPicker({
-        target: 'test2'
-      });
+      // var y = new slickerPicker({
+      //   target: 'test2'
+      // });
+
+      new sp();
 </script>
 </html>
