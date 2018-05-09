@@ -71,14 +71,21 @@ border: 1px solid lightgrey;
 	flex-direction: column;
 	height: 180px;
 		border: 1px solid lightgrey;
+		 background-image: linear-gradient(45deg, lightgrey 25%, transparent 25%), linear-gradient(-45deg, lightgrey 25%, transparent 25%), linear-gradient(45deg, transparent 75%, lightgrey 75%), linear-gradient(-45deg, transparent 75%, lightgrey 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
 }
 
 .shadesPicker li{
 	height: 36px;
-
-}
-.shadesPicker li{
 	border-top: 1px solid lightgrey;
+	transition: 100ms;
+	transform-origin: center;
+}
+.shadesPicker li:hover {
+	transform: scale(1.2,1.2);
+	border-color: transparent;
+	cursor: pointer;
 }
 .shadesPicker li:nth-child(1){
 	border-top: none;
