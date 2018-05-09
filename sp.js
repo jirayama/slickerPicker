@@ -2,10 +2,12 @@ function sp(opt) {
 	// state
 	opt = opt || {};
 
-	var readout = 0,
-			current_rgba = opt.rbga || [],
+	var readout = 0,			
 			current_a = 1,
-			current_h = 50,
+			current_h = 240,
+			current_s = 100,
+			current_l = 50,
+			current_rgb = opt.rbga || hsl2rbg(current_h, current_s, current_l),
 			shades = {
 				lighter: [],
 				light: [],
@@ -13,6 +15,8 @@ function sp(opt) {
 				dark: [],
 				darker: []
 			};
+
+			console.log(current_rgb)
 
 	// set up DOM structure
 	var module = new El('div').addClass('module').addId('module'),
@@ -81,31 +85,69 @@ function sp(opt) {
 
 	module.appendMany(module_top,	module_bottom);
 
-	//easing
-	Math.easeInQuad = function (t, b, c, d) {
-	t /= d;
-	return c*t*t + b;
-};
-	Math.easeOutQuad = function (t, b, c, d) {
-	t /= d;
-	return -c * t*(t-2) + b;
-};
-Math.easeInOutQuad = function (t, b, c, d) {
-	t /= d/2;
-	if (t < 1) return c/2*t*t + b;
-	t--;
-	return -c/2 * (t*(t-2) - 1) + b;
-};
+	//helpers
+	function set_color_HSL(h,s,l){
+	  current_rgb = hsl2rbg(h,s,l);
+	  current_h = h;
+	  current_s = s;
+	  current_l = l;
+	}
 
-Math.easeOutExpo = function (t, b, c, d) {
-	return c * ( -Math.pow(2, -10 * t/d ) + 1 ) + b;
-};
-Math.easeOutExpoSuper = function (t, b, c, d) {
-	return c * ( -Math.pow( 10, -3 * t/d ) + 1 ) + b;
-};
-Math.linearTween = function (t, b, c, d) {
-	return c*t/d + b;
-};
+	function set_color_RGB(rgb){
+	  var hsl = rgba2hsl(rgb);
+	  current_rgb = rgb;
+	  current_h = hsl[0];
+	  current_s = hsl[1];
+	  current_l = hsl[2];
+	}
+
+	function set_bgc_HSL(el,color){
+		el.style.background = "hsl(" + color[0] + "," + color[1] + "%, " + color[2] + "%)";
+	}
+
+	function set_bgc_RGBA(el,color){
+		//rgb and current alpha
+		el.style.background = "rgba(" + color[0] + "," + color[1] + ", " + color[2] + ", " + current_a +")";
+	}
+
+	function shade(color, percent){
+		// rgb
+		var hsl = rgba2hsl(color),
+				rgb;
+		hsl[2] = hsl[2] + percent;
+		if(hsl[2] < 0 ){
+			hsl[2] = 0;
+		} else if(hsl[2] > 100 ){
+			hsl[2] = 100;
+		}
+		rgb = hsl2rbg(hsl[0], hsl[1], hsl[2]);
+		return rgb;
+	}
+
+	//easing
+	Math.easeInQuad = function(t, b, c, d) {
+	  t /= d;
+	  return c * t * t + b;
+	};
+	Math.easeOutQuad = function(t, b, c, d) {
+	  t /= d;
+	  return -c * t * (t - 2) + b;
+	};
+	Math.easeInOutQuad = function(t, b, c, d) {
+	  t /= d / 2;
+	  if (t < 1) return c / 2 * t * t + b;
+	  t--;
+	  return -c / 2 * (t * (t - 2) - 1) + b;
+	};
+	Math.easeOutExpo = function (t, b, c, d) {
+		return c * ( -Math.pow(2, -10 * t/d ) + 1 ) + b;
+	};
+	Math.easeOutExpoSuper = function (t, b, c, d) {
+		return c * ( -Math.pow( 10, -3 * t/d ) + 1 ) + b;
+	};
+	Math.linearTween = function (t, b, c, d) {
+		return c*t/d + b;
+	};
 
 
 	// actions
@@ -120,42 +162,65 @@ Math.linearTween = function (t, b, c, d) {
           x = 0,
           y = 0,
           color,
+          width = 198,
+          height = 128,
           rate = 200,          
-          dist = (endS - startS)/200,
-          incr = (endS - startS)/200/130;
+          dist = (endS - startS)/width,
+          incr = (endS - startS)/width/130;
 
-      colorPicker_ctx.clearRect(0, 0, 200, 130);
+      colorPicker_ctx.clearRect(0, 0, width, 130);
 
-      for (y = 0; y <= 130; y++) {
-        for (x = 0; x <= 200; x++) {       
-          s = Math.easeInQuad(x, startS, (100 - startS ), 200);
-          l = Math.easeOutQuad(x, startL, -(startL - endL), 200); 
+      for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++) {       
+          s = Math.easeInQuad(x, startS, (100 - startS ), width);
+          l = Math.easeOutQuad(x, startL, -(startL - endL), width); 
           colorPicker_ctx.fillStyle = "hsl(" + h + "," + s + "%," + l + "%)";
-          // if(l>25 && l<26 || l>50 && l<51 || l>75 && l<76) {
-          // 	colorPicker_ctx.fillStyle = "white";
+          // if(l>25 && l<26 || l>50 && l<51 || l>75 && l<76 || l > 99 || l < 1) {
+          // 	colorPicker_ctx.fillStyle = "pink";
           // } 
-          // if(s>25 && s < 26 || s>50 && s < 51 ||s>75 && s < 76 || s>99){
+          // if(s>25 && s < 26 || s>50 && s < 51 ||s>75 && s < 76 || s>99 || s < 1){
           // 	colorPicker_ctx.fillStyle = "red";
-          // }
-          // if( s < 1){
-          // 	colorPicker_ctx.fillStyle = "yellow";
           // }
           colorPicker_ctx.fillRect(x, y, 1, 1);             
         }
-      	startS = Math.easeOutExpo(y, 100, -100, 130);
-      	startL = Math.linearTween(y, 100, -100, 130);
-      	endL = Math.easeInQuad(y, 50, -50, 130); 
+      	startS = Math.easeOutExpo(y, 100, -100, height);
+      	startL = Math.linearTween(y, 100, -100, height);
+      	endL = Math.easeInQuad(y, 50, -50, height); 
       }
     }
 	function draw_huePicker() {
-    var h = 1,
+		var width = 198,
+      	height = 18,
+      	h = 1,
         color;
-    for (var x = 0; x <= 200; x++) {
+    for (var x = 0; x < width; x++) {
       color = hsl2rbg(h, 100, 50);
       huePicker_ctx.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
-      huePicker_ctx.fillRect(x, 0, 1, 18);
-      h = h + (360 / 200);
+      huePicker_ctx.fillRect(x, 0, 1, height);
+      h = h + (360 / width);
     }
+  }
+
+  function draw_alphaPicker() {
+    var width = 198,
+  		height = 18;
+
+    alphaPicker_ctx.clearRect(0, 0, width, height);
+
+    var current_a = 0;
+    for (var x = 0; x < width; x++) {
+      alphaPicker_ctx.fillStyle = "rgba(" + current_rgb[0] + "," + current_rgb[1] + "," + current_rgb[2] + "," + current_a/100 +")";
+      alphaPicker_ctx.fillRect(x, 0, 1, height);
+      current_a = current_a + (100 / width);
+    }
+  }
+
+  function draw_shades(){
+  	set_bgc_RGBA(shade_lighter, shade(current_rgb, 35));
+  	set_bgc_RGBA(shade_light, shade(current_rgb, 25));
+  	set_bgc_RGBA(shade_primary, current_rgb);
+  	set_bgc_RGBA(shade_dark, shade(current_rgb, -8));
+  	set_bgc_RGBA(shade_darker, shade(current_rgb, -15));  	
   }
 
 	function update_readout_display(){
@@ -182,19 +247,22 @@ Math.linearTween = function (t, b, c, d) {
 	});
 
 
-	// init 
-	update_readout_display();
-	draw_colorPicker(current_h);
-	draw_huePicker();
+	// init
+	function init(){
+		update_readout_display();
+		draw_colorPicker(current_h);
+		draw_huePicker();
+		draw_alphaPicker();
+		draw_shades();
+	}
+	
 
 	module.addEventListener('wheel', function(e){
 		if(e.deltaY === -100 ){
 			current_h = current_h  - 10;
-			console.log("-", current_h)
 		} 
 		if(e.deltaY === 100 ){
 			current_h = current_h  + 10;
-			console.log("+", current_h)
 		}
 
 		if(current_h<=0){
@@ -203,15 +271,17 @@ Math.linearTween = function (t, b, c, d) {
 		if(current_h>360){
 			current_h = 360;
 		}
-		draw_colorPicker(current_h);
+		set_color_HSL(current_h, current_s, current_l);
+		init();
 	})
 
 	function loop(){
-		current_h++;
+		current_h = current_h  + 5;
+		set_color_HSL(current_h, current_s, current_l);
 		if(current_h>360){
 			current_h = 1;
 		}
-		draw_colorPicker(current_h);
+		init();
 		requestAnimationFrame(loop);
 	}
 
@@ -219,7 +289,9 @@ Math.linearTween = function (t, b, c, d) {
 	document.getElementById('test1').appendMany(module);
 	console.log(module);
 
-	loop();
+	init();
+
+	// loop();
 }
 
 
