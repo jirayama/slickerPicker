@@ -88,3 +88,7 @@ function rgba2hsl(rbg) {
   if (isNaN(l)) return false;
   return [h, s, l];
 }
+
+function rgbToHex(rgb) {
+    return '#' + ((rgb[0] << 16) | (rgb[1] << 8) | rgb[2]).toString(16);
+}
