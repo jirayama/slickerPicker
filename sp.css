@@ -84,7 +84,7 @@ border: 1px solid lightgrey;
 }
 .shadesPicker li:hover {
 	transform: scale(1.2,1.2);
-	border-color: transparent;
+	border: 1px solid #424242 !important;
 	cursor: pointer;
 }
 .shadesPicker li:nth-child(1){
