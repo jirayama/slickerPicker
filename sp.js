@@ -118,7 +118,6 @@ function sp(opt) {
 		pos = pos || current_pos;
 		var rgb = colorPicker_ctx.getImageData(pos.x, pos.y, 1, 1).data;
 	  var hsl = rgba2hsl(rgb);
-	  console.log(rgb)
 	  current_rgb = rgb;
 	  current_h = hsl[0];
 	  current_s = hsl[1];
@@ -344,7 +343,7 @@ function sp(opt) {
 
 	alphaPicker_can.addEventListener('pointerdown', function(e){
 		pointer_start = "alpha";
-		var temp_a = precisionRound(e.offsetX/2/95.3);
+		var temp_a = precisionRound(e.offsetX/2/95,3);
       	if(temp_a > 1)temp_a=1;
       	if(temp_a < 0)temp_a=0;
 		current_a = temp_a;
