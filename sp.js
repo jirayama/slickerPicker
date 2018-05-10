@@ -4,41 +4,35 @@ function sp(opt) {
 
 	var readout = 0,			
 			current_a = 1,
-			current_h = 240,
+			current_h = 14,
 			current_s = 100,
 			current_l = 50,
 			current_rgb = opt.rbga || hsl2rbg(current_h, current_s, current_l),
-			shades = {
-				lighter: [],
-				light: [],
-				primary: [],
-				dark: [],
-				darker: []
-			};
-
-			console.log(current_rgb)
+			current_pos = {x:172,y:22},
+			pointer_status = 0,
+			pointer_start = "";
 
 	// set up DOM structure
-	var module = new El('div').addClass('module').addId('module'),
-			module_top = new El('div').addClass('module_top').addId('module_top'),
-			module_left = new El('div').addClass('module_left').addId('module_left'),
-			module_right = new El('div').addClass('module_right').addId('module_right'),
-			module_bottom = new El('div').addClass('module_bottom').addId('module_bottom'),
-			colorPicker = new El('div').addClass('colorPicker'),
+	var module = new El('div').addClass('module').addId('sp_module'),
+			module_top = new El('div').addClass('module_top').addId('sp_module_top'),
+			module_left = new El('div').addClass('module_left').addId('sp_module_left'),
+			module_right = new El('div').addClass('module_right').addId('sp_module_right'),
+			module_bottom = new El('div').addClass('module_bottom').addId('sp_module_bottom'),
+			colorPicker = new El('div').addClass('colorPicker').addId('sp_colorPicker'),
 			colorPicker_can = new El('canvas').addId('colorPicker'),
 			colorPicker_ctx = colorPicker_can.getContext('2d'),
-			huePicker = new El('div').addClass('huePicker'),
+			huePicker = new El('div').addClass('huePicker').addId('sp_huePicker'),
 			huePicker_can = new El('canvas').addId('huePicker'),
 			huePicker_ctx = huePicker_can.getContext('2d'),
-			alphaPicker = new El('div').addClass('alphaPicker'),
+			alphaPicker = new El('div').addClass('alphaPicker').addId('sp_alphaPicker'),
 			alphaPicker_can = new El('canvas').addId('alphaPicker'),
 			alphaPicker_ctx = alphaPicker_can.getContext('2d'),
 			shadesPicker = new El('ul').addClass('shadesPicker').addId('shadesPicker'),
-			shade_lighter = new El('li').addId('shade_lighter'),
-			shade_light = new El('li').addId('shade_light'),
-			shade_primary = new El('li').addId('shade_primary'),
-			shade_dark = new El('li').addId('shade_dark'),
-			shade_darker = new El('li').addId('shade_darker'),
+			shade_lighter = new El('li').addId('sp_shade_lighter'),
+			shade_light = new El('li').addId('sp_shade_light'),
+			shade_primary = new El('li').addId('ssp_hade_primary'),
+			shade_dark = new El('li').addId('sp_shade_dark'),
+			shade_darker = new El('li').addId('sp_shade_darker'),
 			clearfix = new El('div').addClass('clearfix'),
 			readout_change = new El('div').addClass('readout_change').addId('readout_change'),
 			readout_rgba = new El('table').addClass('readoutTable').addId('readout_rgba'),
@@ -53,7 +47,10 @@ function sp(opt) {
 			input_l = new El('input').addType('number'),
 			input_hex = new El('input').addType('text');
 
-
+	colorPicker_can.draggable = false;
+	huePicker_can.draggable = false;
+	alphaPicker_can.draggable = false;
+		
 	readout_rgba.appendMany(DOM_tableRow(input_r, input_g, input_b, input_a));
 	readout_rgba.appendMany(DOM_tableHeader("r", "g", "b", "a"));
 
@@ -86,6 +83,11 @@ function sp(opt) {
 	module.appendMany(module_top,	module_bottom);
 
 	//helpers
+	function precisionRound(number, precision) {
+	  var factor = Math.pow(10, precision);
+	  return Math.round(number * factor) / factor;
+	}
+
 	function set_color_HSL(h,s,l){
 	  current_rgb = hsl2rbg(h,s,l);
 	  current_h = h;
@@ -99,6 +101,39 @@ function sp(opt) {
 	  current_h = hsl[0];
 	  current_s = hsl[1];
 	  current_l = hsl[2];
+
+	  input_h.value = current_h;
+	  input_s.value = current_s;
+	  input_l.value = current_l;
+
+	  input_r.value = current_rgb[0];
+	  input_g.value = current_rgb[1];
+	  input_b.value = current_rgb[2];
+	  input_a.value = current_a;
+
+	  input_hex.value = rgbToHex(current_rgb);
+	}
+
+	function set_color_pos(pos){
+		pos = pos || current_pos;
+		var rgb = colorPicker_ctx.getImageData(pos.x, pos.y, 1, 1).data;
+	  var hsl = rgba2hsl(rgb);
+	  console.log(rgb)
+	  current_rgb = rgb;
+	  current_h = hsl[0];
+	  current_s = hsl[1];
+	  current_l = hsl[2];
+
+	  input_h.value = current_h;
+	  input_s.value = current_s;
+	  input_l.value = current_l;
+
+	  input_r.value = current_rgb[0];
+	  input_g.value = current_rgb[1];
+	  input_b.value = current_rgb[2];
+	  input_a.value = current_a;
+
+	  input_hex.value = rgbToHex(current_rgb);
 	}
 
 	function set_bgc_HSL(el,color){
@@ -107,7 +142,7 @@ function sp(opt) {
 
 	function set_bgc_RGBA(el,color){
 		//rgb and current alpha
-		el.style.background = "rgba(" + color[0] + "," + color[1] + ", " + color[2] + ", " + current_a +")";
+		el.style.backgroundColor = "rgba(" + color[0] + "," + color[1] + ", " + color[2] + ", " + current_a +")";
 	}
 
 	function shade(color, percent){
@@ -152,7 +187,7 @@ function sp(opt) {
 
 	// actions
 	function draw_colorPicker(h) {
-      h = h || hue;
+      h = h || current_h;
       var s = 0,
           l = 100,
           endL = 50,
@@ -164,14 +199,15 @@ function sp(opt) {
           color,
           width = 198,
           height = 128,
-          rate = 200,          
+          rate = 200,         
           dist = (endS - startS)/width,
           incr = (endS - startS)/width/130;
 
       colorPicker_ctx.clearRect(0, 0, width, 130);
 
-      for (y = 0; y < height; y++) {
-        for (x = 0; x < width; x++) {       
+      for (y = 130; y>=0; y--){
+      	x = 0;
+        for (x = 200; x >= 0; x--) {        
           s = Math.easeInQuad(x, startS, (100 - startS ), width);
           l = Math.easeOutQuad(x, startL, -(startL - endL), width); 
           colorPicker_ctx.fillStyle = "hsl(" + h + "," + s + "%," + l + "%)";
@@ -185,7 +221,7 @@ function sp(opt) {
         }
       	startS = Math.easeOutExpo(y, 100, -100, height);
       	startL = Math.linearTween(y, 100, -100, height);
-      	endL = Math.easeInQuad(y, 50, -50, height); 
+      	endL = Math.easeInQuad(y, 50, -50, height);
       }
     }
 	function draw_huePicker() {
@@ -207,17 +243,17 @@ function sp(opt) {
 
     alphaPicker_ctx.clearRect(0, 0, width, height);
 
-    var current_a = 0;
+    var a = 0;
     for (var x = 0; x < width; x++) {
-      alphaPicker_ctx.fillStyle = "rgba(" + current_rgb[0] + "," + current_rgb[1] + "," + current_rgb[2] + "," + current_a/100 +")";
+      alphaPicker_ctx.fillStyle = "rgba(" + current_rgb[0] + "," + current_rgb[1] + "," + current_rgb[2] + "," + a/100 +")";
       alphaPicker_ctx.fillRect(x, 0, 1, height);
-      current_a = current_a + (100 / width);
+      a = a + (100 / width);
     }
   }
 
   function draw_shades(){
-  	set_bgc_RGBA(shade_lighter, shade(current_rgb, 35));
-  	set_bgc_RGBA(shade_light, shade(current_rgb, 25));
+  	set_bgc_RGBA(shade_lighter, shade(current_rgb, 15));
+  	set_bgc_RGBA(shade_light, shade(current_rgb, 8));
   	set_bgc_RGBA(shade_primary, current_rgb);
   	set_bgc_RGBA(shade_dark, shade(current_rgb, -8));
   	set_bgc_RGBA(shade_darker, shade(current_rgb, -15));  	
@@ -239,6 +275,28 @@ function sp(opt) {
 		}
 	}
 
+	function update_hue_change(h){	
+		draw_colorPicker(h);
+		set_color_RGB(colorPicker_ctx.getImageData(current_pos.x, current_pos.y, 1, 1).data);
+		draw_shades();
+		draw_alphaPicker();		
+	}
+
+	function update_alpha_change(){
+		set_color_pos();
+		update_readout_display();
+		draw_shades();		
+	}
+
+	function update_selected(pos){
+		current_pos.x = pos.x;
+		current_pos.y = pos.y;
+		draw_shades();
+		update_readout_display();
+		draw_alphaPicker();
+		draw_shades();
+	}
+
 	// event listeners 
 	readout_change.addEventListener('click', function(){
 		readout++;
@@ -246,14 +304,77 @@ function sp(opt) {
 		update_readout_display();
 	});
 
+	// log click status
+	module.addEventListener('pointerdown', function(){
+		pointer_status = 1;
+	});
+	document.addEventListener('pointerup', function(){
+		pointer_status = 0;
+	});
+
+	colorPicker_can.addEventListener('pointerdown', function(e){
+		pointer_start = "color";
+    set_color_RGB(colorPicker_ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data);
+    update_selected({x:e.offsetX, y:e.offsetY});      
+	});
+
+	colorPicker_can.addEventListener('pointermove', function(e){
+		e.target.draggable = false;
+      if(pointer_start === "color" && pointer_status === 1 && e.offsetY < 128  && e.offsetX < 198){
+      	set_color_RGB(colorPicker_ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data);
+      	update_selected({x:e.offsetX, y:e.offsetY});
+      }
+	});
+
+	huePicker_can.addEventListener('pointerdown', function(e){
+		pointer_start = "hue";
+    var rgb = huePicker_ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data;
+    var hsl = rgba2hsl(rgb);   	
+    update_hue_change(hsl[0]);
+	});
+
+	huePicker_can.addEventListener('pointermove', function(e){
+		e.target.draggable = false;
+      if(pointer_start === "hue" && pointer_status === 1 && e.offsetY < 18  && e.offsetX < 198){
+      	 var rgb = huePicker_ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data;
+      	var hsl = rgba2hsl(rgb);
+   			update_hue_change(hsl[0]);
+      }
+	});
+
+	alphaPicker_can.addEventListener('pointerdown', function(e){
+		pointer_start = "alpha";
+		var temp_a = precisionRound(e.offsetX/2/95.3);
+      	if(temp_a > 1)temp_a=1;
+      	if(temp_a < 0)temp_a=0;
+		current_a = temp_a;
+		update_alpha_change();
+	});
+
+	alphaPicker_can.addEventListener('pointermove', function(e){
+		e.target.draggable = false;
+      if(pointer_start === "alpha" && pointer_status === 1 && e.offsetY < 18  && e.offsetX < 198){
+      	var temp_a = precisionRound(e.offsetX/2/95,3);
+      	if(temp_a > 1)temp_a=1;
+      	if(temp_a < 0)temp_a=0;
+      	current_a = temp_a;
+      	update_alpha_change();
+      }
+	});
+
+
 
 	// init
 	function init(){
+		
 		update_readout_display();
-		draw_colorPicker(current_h);
+		draw_colorPicker();
 		draw_huePicker();
 		draw_alphaPicker();
 		draw_shades();
+		set_color_pos();
+		draw_colorPicker();
+		console.log(current_rgb)
 	}
 	
 
@@ -290,6 +411,7 @@ function sp(opt) {
 	console.log(module);
 
 	init();
+	set_color_RGB([12,120,50])
 
 	// loop();
 }
