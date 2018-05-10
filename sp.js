@@ -57,7 +57,7 @@ function sp(opt) {
 	readout_hsl.appendMany(DOM_tableRow(input_h, input_s, input_l));
 	readout_hsl.appendMany(DOM_tableHeader("h", "s", "l"));
 
-	readout_hex.appendMany(DOM_tableRow(input_hex,));
+	readout_hex.appendMany(DOM_tableRow(input_hex));
 	readout_hex.appendMany(DOM_tableHeader("hex"));
 
 	shadesPicker.appendMany(shade_lighter,	shade_light, shade_primary,	shade_dark,	shade_darker);
@@ -373,46 +373,15 @@ function sp(opt) {
 		draw_shades();
 		set_color_pos();
 		draw_colorPicker();
-		console.log(current_rgb)
 	}
-	
 
-	module.addEventListener('wheel', function(e){
-		if(e.deltaY === -100 ){
-			current_h = current_h  - 10;
-		} 
-		if(e.deltaY === 100 ){
-			current_h = current_h  + 10;
-		}
-
-		if(current_h<=0){
-			current_h = 1;
-		}
-		if(current_h>360){
-			current_h = 360;
-		}
-		set_color_HSL(current_h, current_s, current_l);
-		init();
-	})
-
-	function loop(){
-		current_h = current_h  + 5;
-		set_color_HSL(current_h, current_s, current_l);
-		if(current_h>360){
-			current_h = 1;
-		}
-		init();
-		requestAnimationFrame(loop);
-	}
 
 	// test output
 	document.getElementById('test1').appendMany(module);
 	console.log(module);
 
 	init();
-	set_color_RGB([12,120,50])
-
-	// loop();
+	set_color_RGB([12,120,50]);
 }
 
 
