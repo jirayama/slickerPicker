@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<style type="text/css">
+	   * {
+     box-sizing: border-box;
+     margin: 0;
+     padding: 0;
+     font-family: 'Inter UI', sans-serif;
+   }
+		body {
+			background: slategrey;
+		}
+   .module {
+    width: 300px;
+    /* padding: 5px; */
+    background: white;
+   }
+
+	.module_left {
+   	width: 50%;
+   	display: inline-block;
+   	float: left;
+   	padding: 6px;
+   	padding-right: 3px;
+   }
+  .module_right {
+   	width: 50%;
+   	display: inline-block;
+   	padding:  6px;
+   	padding-left: 3px;
+   }
+
+
+
+.readoutTable  {
+	border-collapse: separate;
+	float: left;
+}
+
+
+.readoutTable_rgba{
+	width: 100%;
+	padding-bottom: 5px;
+}
+.readoutTable_hex{
+	width: 75%;
+	    display: flex;
+    flex-direction: row;
+}
+.readoutTable_shades{
+	width: 25%;
+	padding-right: 5px;
+}
+.readoutTable_hsl{
+	width: 75%;
+	padding-bottom: 5px;
+}
+
+.readoutTable td{border: 1px solid #d3d9de;}
+.readoutTable th {
+	width: 30px;
+	background: white;
+	text-align:  center;
+	font-size:  10px;
+	padding:  2px;
+	color: slategrey;
+	border: 1px solid #d3d9de;
+}
+.readoutTable input {
+	width: 100%;
+	border: none;
+}
+
+
+		.readoutTable input[type=number]::-webkit-inner-spin-button,
+		.readoutTable input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.ro_labels {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.ro_labels  div{
+		font-size:  10px;
+	color: slategrey;
+	border: 1px solid #d3d9de;
+	background: white;
+	width:100%;
+		text-align:  center;
+		padding: 2px;
+		margin-left: 2px;
+}
+.ro_inputs{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.ro_inputs input{
+	border: 1px solid lightgrey;
+}
+
+.readoutTable_shades div{
+	border: 1px solid lightgrey;
+}
+
+	</style>
+
+
+</head>
+<body>
+	<div class="module">
+		<div class="module_left">
+			<div class="color_picker"></div>
+			<div class="hue_picker"></div>
+			<div class="alpha_picker"></div>
+		</div>
+		<div class="module_right">
+			<div class="readoutTable readoutTable_rgba">
+				<div class="ro_labels">
+					<div >R</div>
+					<div >G</div>
+					<div >B</div>
+					<div >A</div>
+				</div>
+				<div class="ro_inputs">
+					<input class="ro_td" type="number" name="">
+					<input class="ro_td" type="number" name="">
+					<input class="ro_td" type="number" name="">
+					<input class="ro_td" type="number" name="">
+				</div>
+			</div>
+			<div class="readoutTable readoutTable_shades">
+
+					<div>l</div>
+					<div>p</div>
+					<div>d</div>
+
+			</div>
+			<div class="readoutTable readoutTable_hsl">
+				<div class="ro_labels">
+					<div >H</div>
+					<div >S</div>
+					<div >L</div>
+				</div>
+				<div class="ro_inputs">
+					<input class="ro_td" type="number" name="">
+					<input class="ro_td" type="number" name="">
+					<input class="ro_td" type="number" name="">
+				</div>
+			</div>
+			<div class="readoutTable readoutTable_hex">
+					<div >#</div>
+					<input type="number" name="">
+			</div>
+
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>
