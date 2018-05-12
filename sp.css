@@ -74,7 +74,7 @@ border: 1px solid lightgrey;
 	display: flex;
 	flex-direction: column;
 	height: 180px;
-		border: 1px solid lightgrey;
+		/*border: 1px solid lightgrey;*/
 		 background-image: linear-gradient(45deg, lightgrey 25%, transparent 25%), linear-gradient(-45deg, lightgrey 25%, transparent 25%), linear-gradient(45deg, transparent 75%, lightgrey 75%), linear-gradient(-45deg, transparent 75%, lightgrey 75%);
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
@@ -82,7 +82,7 @@ border: 1px solid lightgrey;
 
 .shadesPicker li{
 	height: 36px;
-	border: 5px solid whitesmoke;
+	border: 3px solid whitesmoke;
 	border-bottom-width: 0;
 	transition: 50ms;
 	transform-origin: center;
