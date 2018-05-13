@@ -57,6 +57,9 @@ function sp(opt) {
 	huePicker_can.draggable = false;
 	alphaPicker_can.draggable = false;
 
+	knob_ap.style.transform = "translateX(198px)";
+	knob_cp.style.transform = "translateX(198px)";
+
 	readout_rgba.appendMany(DOM_tableRow(input_r, input_g, input_b, input_a));
 	readout_rgba.appendMany(DOM_tableHeader("r", "g", "b", "a"));
 
@@ -65,6 +68,11 @@ function sp(opt) {
 
 	readout_hex.appendMany(DOM_tableRow(input_hex));
 	readout_hex.appendMany(DOM_tableHeader("hex"));
+
+	var svg = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"	style="fill: #918c8c; width: 20px; height: 35px; margin-left: 2px;" viewBox="0 0 30 30" enable-background="new 0 0 30 30" xml:space="preserve">	<path d="M22.948,10.05c0.147,0.18,0.179,0.428,0.079,0.639c-0.1,0.21-0.312,0.344-0.544,0.344H7.518	c-0.233,0-0.444-0.134-0.544-0.344c-0.099-0.21-0.068-0.459,0.079-0.639l7.015-8.54c0.229-0.279,0.572-0.441,0.934-0.441	s0.704,0.162,0.934,0.441L22.948,10.05z"/>	<path d="M7.052,19.951c-0.147-0.18-0.178-0.429-0.079-0.639c0.1-0.211,0.311-0.345,0.543-0.345h14.966	c0.232,0,0.444,0.134,0.544,0.345c0.1,0.21,0.068,0.459-0.079,0.639l-7.014,8.538c-0.229,0.279-0.572,0.441-0.934,0.441	s-0.704-0.162-0.934-0.441L7.052,19.951z"	/>	</svg>';
+
+  
+  readout_change.innerHTML = svg;
 
 	shadesPicker.appendMany(shade_lighter,	shade_light, shade_primary,	shade_dark,	shade_darker);
 	module_right.appendMany(shadesPicker);
@@ -372,11 +380,17 @@ function sp(opt) {
 			 knob_hp.style.transform = "translateX(" + x + "px)";
 			update_hue_change(x*(360/198));
 
-    } else if(pointer_start === "alphaPicker" && pointer_status === 1 && y < 18  && x < 198){
+    } else if(pointer_start === "alphaPicker" && pointer_status === 1){
       var temp_a = precisionRound(x/2/95,3);
       if(temp_a > 1)temp_a=1;
       if(temp_a < 0)temp_a=0;
       current_a = temp_a;
+      if(y > 18)y=18;
+			if(x > 198)x=198;
+			if(y < 0)y=0;
+			if(x < 0)x=0;
+
+      knob_ap.style.transform = "translateX(" + x + "px)";
       update_alpha_change();
     }
 	}
@@ -386,6 +400,10 @@ function sp(opt) {
 		pointer_start = e.target.id;
 		if(e.target.draggable) e.target.draggable = false;
 		processInteract(e);
+	});
+
+	module.addEventListener('pointerup', function(e){
+		if(e.target.draggable) e.target.draggable = false;
 	})
 
 	module.addEventListener('pointermove', function(e){
@@ -395,39 +413,39 @@ function sp(opt) {
 		// console.log(x, y, pointer_start, pointer_status)
 	});
 
-	colorPicker_can.addEventListener('pointerdown', function(e){
-		// e.target.draggable = false;
-    // set_color_RGB(colorPicker_ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data);
-    // update_selected({x:e.offsetX, y:e.offsetY});
-	});
+	// colorPicker_can.addEventListener('pointerdown', function(e){
+	// 	// e.target.draggable = false;
+ //    // set_color_RGB(colorPicker_ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data);
+ //    // update_selected({x:e.offsetX, y:e.offsetY});
+	// });
 
-	colorPicker_can.addEventListener('pointermove', function(e){
-		// e.target.draggable = false;
-	});
+	// colorPicker_can.addEventListener('pointermove', function(e){
+	// 	// e.target.draggable = false;
+	// });
 
-	huePicker_can.addEventListener('pointerdown', function(e){
-		// e.target.draggable = false;
-    // var rgb = huePicker_ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data;
-    // var hsl = rgba2hsl(rgb);
-    // update_hue_change(hsl[0]);
-	});
+	// huePicker_can.addEventListener('pointerdown', function(e){
+	// 	// e.target.draggable = false;
+ //    // var rgb = huePicker_ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data;
+ //    // var hsl = rgba2hsl(rgb);
+ //    // update_hue_change(hsl[0]);
+	// });
 
-	huePicker_can.addEventListener('pointermove', function(e){
-		// e.target.draggable = false;
-	});
+	// huePicker_can.addEventListener('pointermove', function(e){
+	// 	// e.target.draggable = false;
+	// });
 
-	alphaPicker_can.addEventListener('pointerdown', function(e){
-		// e.target.draggable = false;
-		var temp_a = precisionRound(e.offsetX/2/95,3);
-      	if(temp_a > 1)temp_a=1;
-      	if(temp_a < 0)temp_a=0;
-		current_a = temp_a;
-		update_alpha_change();
-	});
+	// alphaPicker_can.addEventListener('pointerdown', function(e){
+	// 	// e.target.draggable = false;
+	// 	var temp_a = precisionRound(e.offsetX/2/95,3);
+ //      	if(temp_a > 1)temp_a=1;
+ //      	if(temp_a < 0)temp_a=0;
+	// 	current_a = temp_a;
+	// 	update_alpha_change();
+	// });
 
-	alphaPicker_can.addEventListener('pointermove', function(e){
-		// e.target.draggable = false;
-	});
+	// alphaPicker_can.addEventListener('pointermove', function(e){
+	// 	// e.target.draggable = false;
+	// });
 
 	shadesPicker.addEventListener('pointerdown', function(e){
 		if(e.target.id === "sp_shade_primary"){
