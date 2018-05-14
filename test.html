@@ -11,23 +11,19 @@
            <script type="text/javascript" src="colorConverters.js"></script>
 </head>
 <body>
-	<div id="test1"></div>
-	<div id="test2" style="margin-top: 300px; margin-left: 200px; position: relative;">
+	<input type="text" id="test1"  >
+<!--   <span id="test1"></span> -->
 		
 	</div>
 </body>
 <script>
 
-      // var x = new slickerPicker({
-      //   target: 'test1',
-      //   readout: true
-      // });
 
-      // var y = new slickerPicker({
-      //   target: 'test2'
-      // });
 
-      new sp({id:"test1"});
-      // new sp({id:"test2"});
+      new sp({
+        id:"test1",
+        hue: 30
+      });
+
 </script>
 </html>

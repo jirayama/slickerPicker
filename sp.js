@@ -3,20 +3,24 @@ function sp(opt) {
 	opt = opt || {};
 
 	var readout = 0,
-			current_a = 1,
-			current_h = 14,
+			current_a = opt.opacity || 1,
+			current_h = opt.hue || 198,
 			current_s = 100,
 			current_l = 50,
 			current_rgb = opt.rbga || hsl2rbg(current_h, current_s, current_l),
-			current_pos = {x:172,y:22},
-			current_pos_h = 0,
-			current_pos_a = 198,
-			current_shade = 'sp_shade_primary',
+			current_pos = {x:198,y:0},
+			current_pos_h = current_h/360*200,
+			current_pos_a = current_a*200,
+			current_shade = 2,
+			shades = new Array(5).fill(""),
+			lightnessOffset = 0,
 			pointer_status = 0,
 			pointer_start = "";
 
 	// set up DOM structure
-	var module = new El('div').addClass('module').addId('sp_module'),
+	var sp_btn = new El('div').addClass('slickerPickerWrap'),
+			sp_btnInner = new El('div').addClass('slickerPicker'),
+			module = new El('div').addClass('module').addId('sp_module'),
 			module_top = new El('div').addClass('module_top').addId('sp_module_top'),
 			module_left = new El('div').addClass('module_left').addId('sp_module_left'),
 			module_right = new El('div').addClass('module_right').addId('sp_module_right'),
@@ -46,8 +50,8 @@ function sp(opt) {
 			input_b = new El('input').addType('number'),
 			input_a = new El('input').addType('number'),
 			input_h = new El('input').addType('number'),
-			input_s = new El('input').addType('number'),
-			input_l = new El('input').addType('number'),
+			input_s = new El('input').addType('text'),
+			input_l = new El('input').addType('text'),
 			input_hex = new El('input').addType('text'),
 			knob_cp = new El('div').addClass('knob knob_cp'),
 			knob_hp = new El('div').addClass('knob knob_hp'),
@@ -73,6 +77,8 @@ function sp(opt) {
 
   
   readout_change.innerHTML = svg;
+
+  sp_btn.appendMany(sp_btnInner)
 
 	shadesPicker.appendMany(shade_lighter,	shade_light, shade_primary,	shade_dark,	shade_darker);
 	module_right.appendMany(shadesPicker);
@@ -119,18 +125,45 @@ function sp(opt) {
 	  	hex = rgbToHex(current_rgb);
 	  }
 	  current_rgb = rgb;
-	  current_h = hsl[0];
+	  // current_h = hsl[0];
 	  current_s = hsl[1];
 	  current_l = hsl[2];
 
 	  input_h.value = current_h;
-	  input_s.value = current_s;
-	  input_l.value = current_l;
+	  input_s.value = current_s + "%";
+	  input_l.value = current_l + "%";
 
 	  input_r.value = current_rgb[0];
 	  input_g.value = current_rgb[1];
 	  input_b.value = current_rgb[2];
 	  input_a.value = current_a;
+
+	  input_hex.value = hex;
+
+
+	}
+
+	function update_readout_shade(){
+		var hex,
+	  		temp_rgb = hsl2rbg(current_h, current_s, current_l + lightnessOffset),
+	  		hsl = rgba2hsl([temp_rgb[0], temp_rgb[1], temp_rgb[2], current_a]);
+	  if(!hsl) {
+	  	hsl = [0,0,0];
+	  	hex = "#000000";
+	  } else {
+	  	hex = rgbToHex(temp_rgb);
+	  }
+	  // console.log(current_shade)
+
+	  input_h.value = current_h;
+	  input_s.value = current_s + "%";
+	  input_l.value = (current_l + lightnessOffset) + "%";
+
+	  input_r.value = temp_rgb[0];
+	  input_g.value = temp_rgb[1];
+	  input_b.value = temp_rgb[2];
+	  input_a.value = current_a;
+	  // console.log(current_l, lightnessOffset, temp_rgb, shades[current_shade])
 
 	  input_hex.value = hex;
 	}
@@ -140,7 +173,7 @@ function sp(opt) {
 		var rgb = colorPicker_ctx.getImageData(pos.x, pos.y, 1, 1).data;
 	  var hsl = rgba2hsl(rgb);
 	  current_rgb = rgb;
-	  current_h = hsl[0];
+	  // current_h = hsl[0];
 	  current_s = hsl[1];
 	  current_l = hsl[2];
 
@@ -156,8 +189,10 @@ function sp(opt) {
 	  input_hex.value = rgbToHex(current_rgb);
 	}
 
-	function set_bgc_HSL(el,color){
-		el.style.background = "hsl(" + color[0] + "," + color[1] + "%, " + color[2] + "%)";
+	function set_bgc_HSL(el,l){
+		// el.style.background = "hsl(" + current_h + "," + current_s + "%, " + l + "%)";
+		var color = hsl2rbg(current_h, current_s, l);
+		el.style.backgroundColor = "rgba(" + color[0] + "," + color[1] + ", " + color[2] + ", " + current_a +")";
 	}
 
 	function set_bgc_RGBA(el,color){
@@ -236,7 +271,7 @@ function sp(opt) {
              rgb[0];            // red
         }
       	startS = Math.easeOutExpo(y, 100, -100, height);
-      	startL = Math.easeInQuad(y, 100, -100, height);
+      	startL = Math.linearTween(y, 100, -100, height);
       	endL = Math.easeInQuad(y, 50, -50, height);
       }
       imageData.data.set(buf8);
@@ -284,11 +319,18 @@ function sp(opt) {
   }
 
   function draw_shades(){
-  	set_bgc_RGBA(shade_primary, current_rgb);
-  	set_bgc_RGBA(shade_lighter, shade(current_rgb, 15));
-  	set_bgc_RGBA(shade_light, shade(current_rgb, 8));
-  	set_bgc_RGBA(shade_dark, shade(current_rgb, -8));
-  	set_bgc_RGBA(shade_darker, shade(current_rgb, -15));
+  	set_bgc_HSL(shade_lighter, current_l + 20);
+  	set_bgc_HSL(shade_light, current_l + 10);
+  	set_bgc_HSL(shade_primary, current_l);
+  	set_bgc_HSL(shade_dark, current_l - 10);
+  	set_bgc_HSL(shade_darker,current_l - 20);
+
+  	shades[0] = hsl2rbg(current_h, current_s, current_l + 20);
+  	shades[1] = hsl2rbg(current_h, current_s, current_l + 10);
+  	shades[2] = hsl2rbg(current_h, current_s, current_l );
+  	shades[3] = hsl2rbg(current_h, current_s, current_l - 10);
+  	shades[4] = hsl2rbg(current_h, current_s, current_l - 20);
+  	// console.log(shades)
   }
 
 	function update_readout_display(){
@@ -309,6 +351,7 @@ function sp(opt) {
 
 	function update_hue_change(h){
 		draw_colorPicker(h);
+		current_h = h;
 		set_color_RGB(colorPicker_ctx.getImageData(current_pos.x, current_pos.y, 1, 1).data);
 		draw_shades();
 		draw_alphaPicker();
@@ -345,6 +388,24 @@ function sp(opt) {
 		pointer_start = "";
 	});
 
+	document.addEventListener('pointerup', function(e){
+		e.stopPropagation();
+		var modCheck = document.getElementById('sp_module');
+		console.log(modCheck)
+		if(modCheck){			
+			modCheck.remove();
+		}
+	});
+
+	sp_btn.addEventListener('pointerdown', function(e){
+		var modCheck = document.getElementById('sp_module');
+		e.stopPropagation();
+		if(modCheck){
+			modCheck.remove();
+		}
+		sp_btnInner.appendMany(module);
+	})
+
 	function processInteract(e) {
 			var mod = module.getBoundingClientRect(),
 				x = e.x - mod.left,
@@ -365,20 +426,23 @@ function sp(opt) {
 		y -= offsetY;
 
 		if(pointer_start === "colorPicker" && pointer_status === 1){
-			if(y > 128)y=128;
-			if(x > 198)x=198;
+			if(y > 130)y=130;
+			if(x > 199)x=199;
 			if(y < 0)y=0;
 			if(x < 0)x=0;
 			knob_cp.style.transform = "translate(" + x + "px," + y + "px)";
       set_color_RGB(colorPicker_ctx.getImageData(x, y, 1, 1).data);
       update_selected({x:x, y:y});
+      set_bgc_RGBA(sp_btnInner, shades[current_shade]);
     } else if(pointer_start === "huePicker" && pointer_status === 1 ){
     	if(y > 18)y=18;
-			if(x > 198)x=198;
+			if(x > 200)x=200;
 			if(y < 0)y=0;
 			if(x < 0)x=0;
 			 knob_hp.style.transform = "translateX(" + x + "px)";
-			update_hue_change(x*(360/198));
+			// console.log(current_h, Math.round(x*(360/200)))
+			update_hue_change(Math.round(x*(360/200)));
+			set_bgc_RGBA(sp_btnInner, shades[current_shade]);
 
     } else if(pointer_start === "alphaPicker" && pointer_status === 1){
       var temp_a = precisionRound(x/2/95,3);
@@ -386,16 +450,19 @@ function sp(opt) {
       if(temp_a < 0)temp_a=0;
       current_a = temp_a;
       if(y > 18)y=18;
-			if(x > 198)x=198;
+			if(x > 200)x=200;
 			if(y < 0)y=0;
 			if(x < 0)x=0;
 
       knob_ap.style.transform = "translateX(" + x + "px)";
       update_alpha_change();
+      set_bgc_RGBA(sp_btnInner, shades[current_shade]);
     }
 	}
 
 	module.addEventListener('pointerdown', function(e){
+		e.preventDefault();
+		e.stopPropagation();
 		pointer_status = 1;
 		pointer_start = e.target.id;
 		if(e.target.draggable) e.target.draggable = false;
@@ -403,6 +470,10 @@ function sp(opt) {
 	});
 
 	module.addEventListener('pointerup', function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		pointer_status = 0;
+		pointer_start = "";
 		if(e.target.draggable) e.target.draggable = false;
 	})
 
@@ -410,78 +481,54 @@ function sp(opt) {
 		// get pos within module
 		if(e.target.draggable) e.target.draggable = false;
 		processInteract(e);
-		// console.log(x, y, pointer_start, pointer_status)
 	});
-
-	// colorPicker_can.addEventListener('pointerdown', function(e){
-	// 	// e.target.draggable = false;
- //    // set_color_RGB(colorPicker_ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data);
- //    // update_selected({x:e.offsetX, y:e.offsetY});
-	// });
-
-	// colorPicker_can.addEventListener('pointermove', function(e){
-	// 	// e.target.draggable = false;
-	// });
-
-	// huePicker_can.addEventListener('pointerdown', function(e){
-	// 	// e.target.draggable = false;
- //    // var rgb = huePicker_ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data;
- //    // var hsl = rgba2hsl(rgb);
- //    // update_hue_change(hsl[0]);
-	// });
-
-	// huePicker_can.addEventListener('pointermove', function(e){
-	// 	// e.target.draggable = false;
-	// });
-
-	// alphaPicker_can.addEventListener('pointerdown', function(e){
-	// 	// e.target.draggable = false;
-	// 	var temp_a = precisionRound(e.offsetX/2/95,3);
- //      	if(temp_a > 1)temp_a=1;
- //      	if(temp_a < 0)temp_a=0;
-	// 	current_a = temp_a;
-	// 	update_alpha_change();
-	// });
-
-	// alphaPicker_can.addEventListener('pointermove', function(e){
-	// 	// e.target.draggable = false;
-	// });
 
 	shadesPicker.addEventListener('pointerdown', function(e){
 		if(e.target.id === "sp_shade_primary"){
 			shade_primary.className = "shade_selected";
-			shade_selected = e.target.id;
+			current_shade = 2;
+			lightnessOffset = 0;
+			update_readout_shade();			
 		} else {
 			shade_primary.className = "";
 		}
 
 		if(e.target.id === "sp_shade_light"){
 			shade_light.className = "shade_selected";
-			shade_selected = e.target.id;
+			current_shade = 1;
+			lightnessOffset = 10;
+			update_readout_shade();
 		} else {
 			shade_light.className = "";
 		}
 
 		if(e.target.id === "sp_shade_lighter"){
 			shade_lighter.className = "shade_selected";
-			shade_selected = e.target.id;
+			current_shade = 0;
+			lightnessOffset = 20;
+			update_readout_shade();
 		} else {
 			shade_lighter.className = "";
 		}
 
 		if(e.target.id === "sp_shade_dark"){
 			shade_dark.className = "shade_selected";
-			shade_selected = e.target.id;
+			current_shade = 3;
+			lightnessOffset = -10;
+			update_readout_shade();
 		} else {
 			shade_dark.className = "";
 		}
 
 		if(e.target.id === "sp_shade_darker"){
 			shade_darker.className = "shade_selected";
-			shade_selected = e.target.id;
+			current_shade = 4;
+			lightnessOffset = -20;
+			update_readout_shade();
 		} else {
 			shade_darker.className = "";
 		}
+		set_bgc_RGBA(sp_btnInner, shades[current_shade]);
 	})
 
 
@@ -496,16 +543,30 @@ function sp(opt) {
 		draw_shades();
 		set_color_pos();
 		draw_colorPicker();
+		set_color_RGB(current_rgb);
+		knob_cp.style.transform = "translate(" + current_pos.x + "px," + current_pos.y + "px)";
+		knob_hp.style.transform = "translateX(" + current_pos_h + "px)";
+		knob_ap.style.transform = "translateX(" + current_pos_a + "px)";
 	}
 
 
-	// test output
-	// console.log(opt.id, document.getElementById(opt.id));
-	document.getElementById(opt.id).appendMany(module);
-	// console.log(module);
+	// mount module	
+	if(opt.id){
+		var modCheck = document.getElementById('sp_module');
+		if(modCheck){
+			modCheck.remove();
+		}
+		document.getElementById(opt.id).parentNode.appendMany(sp_btn);
+		set_bgc_RGBA(sp_btnInner, current_rgb);
+		console.log(document.getElementById(opt.id).tagName);
+	}
+
+
+	
+	
 
 	init();
-	set_color_RGB([12,120,50]);
+	// set_color_RGB([12,120,50]);
 }
 
 
