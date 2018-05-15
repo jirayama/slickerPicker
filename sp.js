@@ -350,7 +350,6 @@ function sp(opt) {
   document.addEventListener('pointerup', function(e) {
     e.stopPropagation();
     var modCheck = document.getElementById('sp_module');
-    console.log(modCheck)
     if (modCheck) {
       modCheck.remove();
     }
@@ -481,6 +480,7 @@ function sp(opt) {
   })
   // init
   function init() {
+  	set_bgc_RGBA(sp_btnInner, current_rgb);
     update_readout_display();
     draw_colorPicker();
     draw_huePicker();
@@ -496,13 +496,21 @@ function sp(opt) {
   // mount module	
   if (opt.id) {
     var modCheck = document.getElementById('sp_module');
+    // close any open pickers
     if (modCheck) {
       modCheck.remove();
     }
-    document.getElementById(opt.id).parentNode.appendMany(sp_btn);
-    set_bgc_RGBA(sp_btnInner, current_rgb);
+    // check for element type and create module
+    var tar = document.getElementById(opt.id);
+    if(tar.tagName === "INPUT"){
+
+    }
+    tar.parentNode.appendMany(sp_btn);
+
     console.log(document.getElementById(opt.id).tagName);
+    init();
+  } else {
+  	console.log('ERROR! no target ID was assigned')
   }
-  init();
-  // set_color_RGB([12,120,50]);
+ 
 }
